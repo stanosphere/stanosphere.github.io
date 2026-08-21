@@ -118,11 +118,19 @@ h6 {
 /* code blocks (Shiki) */
 pre {
   font-family: var(--mono);
+  font-variant-ligatures: contextual;
+  font-feature-settings: "liga" 1, "calt" 1;
   padding: 1rem 1.1rem;
   border-radius: 6px;
   overflow-x: auto;
   font-size: 0.82rem;
   line-height: 1.5;
+}
+
+pre code {
+  font-family: var(--mono);
+  font-variant-ligatures: contextual;
+  font-feature-settings: "liga" 1, "calt" 1;
 }
 :not(pre) > code {
   font-family: var(--mono);
