@@ -34,7 +34,7 @@ Here's how the wiki describes it:
 
 The key part is that we're allowed **one or more** gaps, and each gap is a single missing rank.
 So it got me thinking: How likely is it that my first hand will contain a straight?
-Now my deck at the time was of course a non-standard deck since Balatro lets you do all sorts of outrageous things like copy cards destroy cards, change the suit and/or rank of a card, that sort of thing.
+Now my deck at the time was of course a non-standard deck since Balatro lets you do all sorts of outrageous things like copy cards, destroy cards, change the suit and/or rank of a card, that sort of thing.
 But I can still ask this question of a standard 52 card deck.
 
 > Given a standard 52 card deck what is the probability that the first 8 cards I draw contain a straight where gaps of one are allowed?
@@ -45,7 +45,7 @@ It's perhaps easiest to answer a different question first though.
 What's the probability of a normal straight appearing in the first 8 cards you draw?
 A naive way to answer this is to generate all possible combinations of 8 cards and then simply count how many contain a straight.
 That's quite a lot of combinations to check of course.
-We can use the well known "n choose k" formula for this ([wikipedia article](https://en.wikipedia.org/wiki/Combination)) $n! / \bigl((n-k)!\,k!\bigr)$ with $n = 52$ and $k = 8$.
+We can use the well known ["n choose k"](<(https://en.wikipedia.org/wiki/Combination)>) formula for this, $n! / \bigl((n-k)!\,k!\bigr)$, with $n = 52$ and $k = 8$.
 An intuitive explanation for this formula is that we have 52 choices for the first card, 51 choices for the 2nd, ... , 45 choices for the 8th: multiplying all those numbers together gives us the $n! / (n-k)!$ part.
 For the division by $k!$ we just note that there are $8!$ ways to arrange the 8 cards we have chosen which all lead to the same set of cards so we divide by it to avoid counting the same combination multiple times.
 Anyway we can just use this result to see that there are $752{,}538{,}150$ ways to choose 8 cards from a full deck. That's just shy of a billion so loads of combinations to check.
@@ -131,7 +131,7 @@ A straight is of course just a run of consecutive cards. So we can detect a stra
 - getting hold of slices of 5 cards, so if we had `[3,4,5,7,8,9,J]` that would gives us three possible slices like `[[3,4,5,7,8], [4,5,7,8,9], [5,7,8,9,J]]`
 - iterating over each slice to see if any contain a run of consecutive cards (which can be done by checking if the last card is 4 away from the first)
 
-That's quite a few steps but I think it's at least fairly straightforward reasoning and I kinda hope a similar approach can be used when we think about straights with gaps (perhaps I should have actually done that before writing this blog post but where's the fun in that?)
+That's quite a few steps but I think it's at least fairly straightforward reasoning and I kind of hope a similar approach can be used when we think about straights with gaps (perhaps I should have actually done that before starting to write this blog post but where's the fun in that?)
 
 Anyway the code looks like this
 
@@ -282,7 +282,7 @@ The `ARG_0` part, I think, is scalacheck trying very hard to simplify the initia
   }
 ```
 
-With this implementation the tests now all pass. Amazing. We may also define a generator that generates hands of a random size that are guaranteed to contain a straight. As I said early we also want these hands to be realistic (contain no duplicate cards) so I can add a sort of meta test for that. To do this we can first choose how many cards we want to be in our hand, generate a straight using `genStraight` and finally keep adding cards to it until we've got a hand of the desired size.
+With this implementation the tests now all pass. Amazing. We may also define a generator that generates hands of a random size that are guaranteed to contain a straight. As I said earlier we also want these hands to be realistic (contain no duplicate cards) so I can add a sort of meta test for that. To do this we can first choose how many cards we want to be in our hand, generate a straight using `genStraight` and finally keep adding cards to it until we've got a hand of the desired size.
 
 ```scala
   val fullDeck: Set[Card] = {
@@ -371,8 +371,8 @@ Now we're ready for the horror of hands that contain more than 5 cards. To find 
 
 Let's work through an example of double counting. Consider the straight where we start at 3, end at 7, and all cards are diamonds.
 Some of the choices for the 6th card will be double counted.
-If the 6th card is one of the 4 remaining 2s then the resulting hand would also be counted when we consider straights that start with a 2s.
-Likewise if the 6th card is one of the 4 remaining 8s then the resulting hand would be double counted when we consider straights that end in 8s.
+If the 6th card is one of the 4 remaining 2s then the resulting hand would also be counted when we consider straights that start with a 2.
+Likewise if the 6th card is one of the 4 remaining 8s then the resulting hand would be double counted when we consider straights that end with an 8.
 There's another more subtle form of double counting.
 Still considering the straight where we start at 3, ends at 7, and all cards are diamonds if we choose the 6th card to be one of the 3 remaining 3s, say the 3 of clubs, then that hand would be double counted when we consider the straight that starts with the 3 clubs and we pick the 3 of diamonds as the 6th card.
 This same argument applies to all numbers featured in our straight: 3,4,5,6,7.
@@ -405,7 +405,7 @@ You either have a pair or you don't.
 
 Let's consider the **no pairs** case first.
 You can either have a standard 5 card straight or if you're luckier a full on 6 card straight (e.g. 2,3,4,5,6,7.)
-Remember at this point we don't care about suits that will come later!
+Remember at this point we don't care about suits, that will come later!
 Ok so how many 6 card straights are there?
 Well the straight can start with anything from Ace through to 9 (if we started with 10 we'd get 10,J,Q,K,A,2 and wrap around straights aren't allowed.)
 So that's 9 possible straights of 6 cards.
@@ -455,11 +455,15 @@ We of course still have 6 cards but we know we always have a pair.
 So for the 4 unpaired cards we pick up a factor of $4 ^ 4$ as each of the 4 cards can be any of the 4 suits (so many 4s!)
 But for the paired cards we have to choose 2 different suits from a possible 4.
 We already know the formula from this from earlier, it's just the binomial coefficient $\tbinom{4}{2} = 6$.
-So all told the final answer for straights in a **hand of 6 with one pair** is $5 \times 10 \times 4 ^ 4 \times \tbinom{4}{2}$ which is $76800$
+So all told the final answer for straights in a **hand of 6 with one pair** is $5 \times 10 \times 4 ^ 4 \times \tbinom{4}{2}$ which is $76{,}800$
+
+Also let's give the "suit factor" a mathematical symbol too, we'll call it $Su(d)$ [^special-unitary]. So in this case we have $Su(d) = 4 ^ 4 \times \tbinom{4}{2}$.
+
+[^special-unitary]: not to be confused with the [special unitary group](https://en.wikipedia.org/wiki/Special_unitary_group) of degree $d$ lol, I've used a lower case u you see!
 
 ##### 6 Cards, Putting it All Together
 
-Wonderful! The last step is simply adding these two number together $290816 + 76800 = 367616$. Wow! That's the same as the brute force method. It is considerably easier to do on a computer than the brute force method, I basically just have to evaluate $5 \times 10 \times 4 ^ 4 \times \tbinom{4}{2} + (2 \times 7 + 8 \times 6 + 9) \times 4^6$ rather than run some exhaustive search. But I have of course just shifted the complexity to working out the ingredients in that formula which, as we have seen, isn't easy (but it's also not too hard.)
+Wonderful! The last step is simply adding these two number together $290{,}816 + 76{,}800 = 367{,}616$. Wow! That's the same as the brute force method. It is considerably easier to do on a computer than the brute force method, I basically just have to evaluate $5 \times 10 \times 4 ^ 4 \times \tbinom{4}{2} + (2 \times 7 + 8 \times 6 + 9) \times 4^6$ rather than run some exhaustive search. But I have of course just shifted the complexity to working out the ingredients in that formula which, as we have seen, isn't easy (but it's also not too hard.)
 
 ##### A General Approach for Dealing with Degeneracy (First Attempt)
 
@@ -526,7 +530,7 @@ Please note that the things that look like powers actually denote _frequencies_ 
 Since I have used quite a bit of scala already it is natural for me to consider how we might model degeneracy classes as a scala type.
 I quite like my scala types to be as precise as possible and there are several tools which help with this.
 The main tools I use are refined types and smart constructors to help constrain my data types.
-I'm using scala 3 for this blog post so I shall use iron types (which I have not yet used at work actually!) and opaque types.
+I'm using scala 3 for this blog post so I shall use [iron types](https://github.com/Iltotore/iron) (which I have not yet used at work actually!) and opaque types.
 It took me a few iterations to get to a model that I was happy with so I think I'll just present it in its final form and explain why I did it this way.
 
 To start with I thought about how we can precisely model the constituent parts of the multiset.
@@ -535,7 +539,7 @@ So the three of a kind example, $\{3,1^4\}$, has a `CardCount` of 3 with `Freque
 A `CardCount` must be between 1 and 4 because there are a maximum of 4 cards of each rank that can appear in a hand.
 `Frequency` just has to be a positive number.
 And then our `DegeneracyClass` is simply a `Map` with `CardCount` as its keys, and `Frequencies` as its values.
-We can model this using [iron types](https://github.com/Iltotore/iron) like so
+We can model this using iron types like so
 
 ```scala
 object Degeneracy:
@@ -555,7 +559,7 @@ So for example if I try to make something like
       Map((5: CardCount) -> (-9: Frequency))
 ```
 
-I'll get an error like
+I'll get a compile time error like
 
 ```sbt
 [error] -- Error: /Users/paulstanford/repos-paul/stanosphere-blog/src/main/scala/stanosphere/balatro/model/Degeneracy.scala:33:11
@@ -599,40 +603,40 @@ Since we are using refined types we have to check the input is legit.
 And since we're already checking the input we might as well check stuff that I can't think of a way to encode in the type system like the fact that we can't have fewer than 5 parts or more than 13 (a straight needs at least 5 distinct ranks, and of course there are only 13 ranks to begin with).
 
 ```scala
-    def fromParts(parts: List[Int]): Either[DegeneracyError, DegeneracyClass] =
-      parts.length match
-        case n if n < 5  => DegeneracyError.TooFewParts(n).asLeft[DegeneracyClass]
-        case n if n > 13 => DegeneracyError.TooManyParts(n).asLeft[DegeneracyClass]
-        case _           => parts.traverse(refineCardCount).map(toMultiset)
+def fromParts(parts: List[Int]): Either[DegeneracyError, DegeneracyClass] =
+  parts.length match
+    case n if n < 5  => DegeneracyError.TooFewParts(n).asLeft[DegeneracyClass]
+    case n if n > 13 => DegeneracyError.TooManyParts(n).asLeft[DegeneracyClass]
+    case _           => parts.traverse(refineCardCount).map(toMultiset)
 
-    private def refineCardCount(part: Int) =
-      part.refineEither[Interval.Closed[1, 4]].leftMap(_ => DegeneracyError.InvalidMultiplicity(part))
+private def refineCardCount(part: Int) =
+  part.refineEither[Interval.Closed[1, 4]].leftMap(_ => DegeneracyError.InvalidMultiplicity(part))
 
-    private def toMultiset(parts: List[CardCount]): DegeneracyClass =
-      parts.groupMapReduce(identity)(Function.const(1: Frequency))(addFrequencies)
+private def toMultiset(parts: List[CardCount]): DegeneracyClass =
+  parts.groupMapReduce(identity)(Function.const(1: Frequency))(addFrequencies)
 
-    /* sadly scala doesn't have dependent types so we must assume that
-     * adding two positive numbers gives a positive number
-     */
-    private def addFrequencies(x: Frequency, y: Frequency): Frequency =
-      (x + y).assume[Positive]
+/* sadly scala doesn't have dependent types so we must assume that
+  * adding two positive numbers gives a positive number
+  */
+private def addFrequencies(x: Frequency, y: Frequency): Frequency =
+  (x + y).assume[Positive]
 ```
 
 for this I've created an `enum` to keep tack of possible errors
 
 ```scala
-  enum DegeneracyError:
-    case TooFewParts(count: Int)
-    case TooManyParts(count: Int)
-    case InvalidMultiplicity(value: Int)
+enum DegeneracyError:
+  case TooFewParts(count: Int)
+  case TooManyParts(count: Int)
+  case InvalidMultiplicity(value: Int)
 
-  object DegeneracyError:
-    given Show[DegeneracyError] =
-      Show.show {
-        case TooFewParts(n)         => s"too few parts: a degeneracy class needs at least 5, got $n"
-        case TooManyParts(n)        => s"too many parts: at most 13 (only 13 ranks), got $n"
-        case InvalidMultiplicity(v) => s"invalid multiplicity $v: each must be in 1..4"
-      }
+object DegeneracyError:
+  given Show[DegeneracyError] =
+    Show.show {
+      case TooFewParts(n)         => s"too few parts: a degeneracy class needs at least 5, got $n"
+      case TooManyParts(n)        => s"too many parts: at most 13 (only 13 ranks), got $n"
+      case InvalidMultiplicity(v) => s"invalid multiplicity $v: each must be in 1..4"
+    }
 ```
 
 that way anyone reading this code can, at a glance, know exactly what can go wrong when trying to construct a degeneracy class.
