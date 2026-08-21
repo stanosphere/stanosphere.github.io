@@ -1,0 +1,33 @@
+---
+// Self-hosted fonts (no external CDN request).
+import "@fontsource-variable/inter";
+import "@fontsource-variable/jetbrains-mono";
+import "../styles/global.css";
+// KaTeX stylesheet — required for math to render correctly.
+import "katex/dist/katex.min.css";
+
+interface Props {
+  title: string;
+  description?: string;
+}
+const { title, description } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    {description && <meta name="description" content={description} />}
+  </head>
+  <body>
+    <header class="site-head">
+      <a href="/" class="site-title">stanosphere</a>
+      <nav><a href="/">posts</a></nav>
+    </header>
+    <main>
+      <slot />
+    </main>
+  </body>
+</html>

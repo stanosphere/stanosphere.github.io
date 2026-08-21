@@ -1,0 +1,15 @@
+# build output
+dist/
+.astro/
+
+# deps
+node_modules/
+
+# env / logs
+.env
+.env.production
+npm-debug.log*
+
+# macOS / editor
+.DS_Store
+.idea/

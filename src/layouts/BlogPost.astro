@@ -1,0 +1,43 @@
+---
+import Base from "./Base.astro";
+
+interface Props {
+  title: string;
+  description: string;
+  pubDate?: Date;
+  draft?: boolean;
+  headings?: { depth: number; slug: string; text: string }[];
+}
+const { title, description, pubDate, draft, headings = [] } = Astro.props;
+
+const toc = headings.filter(
+  (h) => (h.depth === 2 || h.depth === 3) && h.slug !== "footnote-label",
+);
+---
+
+<Base title={title} description={description}>
+  <article>
+    <h1>{title}</h1>
+    <p style="color: var(--muted); margin-top: -0.5rem;">
+      {pubDate && (
+        <time datetime={pubDate.toISOString()}>
+          {pubDate.toLocaleDateString("en-GB", { year: "numeric", month: "long", day: "numeric" })}
+        </time>
+      )}
+      {draft && <span class="draft-tag">draft</span>}
+    </p>
+    {toc.length > 0 && (
+      <nav class="toc" aria-label="Table of contents">
+        <p class="toc-title">Contents</p>
+        <ul>
+          {toc.map((h) => (
+            <li class={`toc-d${h.depth}`}>
+              <a href={`#${h.slug}`}>{h.text}</a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    )}
+    <slot />
+  </article>
+</Base>
