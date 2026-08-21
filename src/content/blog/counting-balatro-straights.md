@@ -948,7 +948,7 @@ $$
 where $m(a_i)$ is a function that gives the multiplicity of each element we can say
 
 $$
-Su({a_1^{m(a_1)}, \ldots, a_t^{m(a_t)}}) = \prod_{i=1}^{t} \binom{4}{a_i}^{m(a_i)}
+Su(\{a_1^{m(a_1)}, \ldots, a_t^{m(a_t)}\}) = \prod_{i=1}^{t} \binom{4}{a_i}^{m(a_i)}
 $$
 
 In a way we're just replacing the values in our multiset with binomial coefficients and interpreting the multiplicities as powers.
