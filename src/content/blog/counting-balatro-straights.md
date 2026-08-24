@@ -459,7 +459,7 @@ So all told the final answer for straights in a **hand of 6 with one pair** is $
 
 Also let's give the "suit factor" a mathematical symbol too, we'll call it $Su(d)$ [^special-unitary]. So in this case we have $Su(d) = 4 ^ 4 \times \tbinom{4}{2}$.
 
-[^special-unitary]: not to be confused with the [special unitary group](https://en.wikipedia.org/wiki/Special_unitary_group) of degree $d$ lol, I've used a lower case u you see!
+[^special-unitary]: Not to be confused with the [special unitary group](https://en.wikipedia.org/wiki/Special_unitary_group) of degree $d$ lol, I've used a lower case u you see!
 
 ##### 6 Cards, Putting it All Together
 
@@ -510,22 +510,22 @@ The above table has a weakness because it's only really showing a specific examp
 A better way to illustrate the multiset nature of the degeneracy classes is a table like this where we consider each degeneracy class to be equivalent to an integer partition of 7 that has at least 5 parts.
 I also show the number of distinct ranks (which is basically 5 + "left over cards" from the previous table) in each case which will help us to count out different flavours of straight correctly.
 
-| Degeneracy Class | multiplicity (partition of 7) | distinct rank |
-| ---------------- | ----------------------------- | ------------- |
-| No Duplicates    | $1{+}1{+}1{+}1{+}1{+}1{+}1$   | 7             |
-| One Pair         | $2{+}1{+}1{+}1{+}1{+}1$       | 6             |
-| Two Pair         | $2{+}2{+}1{+}1{+}1$           | 5             |
-| Three of a kind  | $3{+}1{+}1{+}1{+}1$           | 5             |
+| Degeneracy Class | multiplicity (partition of 7) | distinct ranks |
+| ---------------- | ----------------------------- | -------------- |
+| No Duplicates    | $1{+}1{+}1{+}1{+}1{+}1{+}1$   | 7              |
+| One Pair         | $2{+}1{+}1{+}1{+}1{+}1$       | 6              |
+| Two Pair         | $2{+}2{+}1{+}1{+}1$           | 5              |
+| Three of a kind  | $3{+}1{+}1{+}1{+}1$           | 5              |
 
 As we are not savages we can use standard multiset notation to denote our multiplicities.
 Please note that the things that look like powers actually denote _frequencies_ here, so $\{2^2,1^3\}$ means "2 twos and 3 ones" or in the language of poker "2 pairs and 3 high cards"
 
-| Degeneracy Class | multiset      | distinct rank |
-| ---------------- | ------------- | ------------- |
-| No Duplicates    | $\{1^7\}$     | 7             |
-| One Pair         | $\{2,1^5\}$   | 6             |
-| Two Pair         | $\{2^2,1^3\}$ | 5             |
-| Three of a kind  | $\{3,1^4\}$   | 5             |
+| Degeneracy Class | multiset      | distinct ranks |
+| ---------------- | ------------- | -------------- |
+| No Duplicates    | $\{1^7\}$     | 7              |
+| One Pair         | $\{2,1^5\}$   | 6              |
+| Two Pair         | $\{2^2,1^3\}$ | 5              |
+| Three of a kind  | $\{3,1^4\}$   | 5              |
 
 Since I have used quite a bit of scala already it is natural for me to consider how we might model degeneracy classes as a scala type.
 I quite like my scala types to be as precise as possible and there are several tools which help with this.
@@ -671,7 +671,7 @@ class DegeneracyTest extends munit.FunSuite:
 end DegeneracyTest
 ```
 
-Ok cool! But how do we _actually_ get hold of the degneracy classes for a particular hand size?
+Ok cool! But how do we _actually_ get hold of the degeneracy classes for a particular hand size?
 We can use integer partitions.
 There are a couple of Project Euler problems to do with this (namely [problem 76](https://projecteuler.net/problem=76) and [problem 78](https://projecteuler.net/problem=78))!
 So I can just recycle my previous answers.[^euler]
@@ -835,7 +835,7 @@ Let's give a name to the "number of distinct ranks in a multiset", we can call i
 And now we can deal with $S(r)$ rather than $S(d)$ going forwards!
 You'll recall that earlier we said _"Whether or not a hand contains a straight depends only on the **set** of ranks in that hand."_
 Remember that $S(r)$ is the component that captures the "straightness" of our hands, $P(d)$ and $Su(d)$ are just extra multiplicative factors about the details of how to realise a straight.
-And so considering $S$ to be a function of $r$ alone makes perfect sense given our previous insight, we don't care about the **multi**set nature of our degeneracy classes, we only care about the **set** nature! We don't care about multiplicities at all for $S$, we have $P(d)$ and $Su(d)$ to care about multiplicites for us.
+And so considering $S$ to be a function of $r$ alone makes perfect sense given our previous insight, we don't care about the **multi**set nature of our degeneracy classes, we only care about the **set** nature! We don't care about multiplicities at all for $S$, we have $P(d)$ and $Su(d)$ to care about multiplicities for us.
 
 Speaking of $P$ and $Su$ we should actually go ahead and compute them for this case!
 Let's start with $P(\{2,1^5\})$.
@@ -1327,9 +1327,9 @@ which produces
 
 where of course 10, 71, and 217 match our findings from turning the crank by hand.
 
-I naturaly typed this in to [The On-Line Encyclopedia of Integer Sequences (OEIS)](https://oeis.org/) but it seems not to correspond to a known sequence.
-To me it is somewhat reminisiscent of a row in Pascal's triangle (e.g. 1, 7, 21, 35, 35, 21, 7, 1) in the sense that it starts small, gets big in the middle and crashes back down again.
-This is surely just a superficial simmilarity.
+I naturally typed this in to [The On-Line Encyclopedia of Integer Sequences (OEIS)](https://oeis.org/) but it seems not to correspond to a known sequence.
+To me it is somewhat reminiscent of a row in Pascal's triangle (e.g. 1, 7, 21, 35, 35, 21, 7, 1) in the sense that it starts small, gets big in the middle and crashes back down again.
+This is surely just a superficial similarity.
 
 Ok I am now ready to include this in the main file. Huge moment.
 
@@ -1498,13 +1498,13 @@ All I did was generate all possible hands and then count how many hands `contain
   }
 ```
 
-At first I thought maybe I could bascially subtelly change the `highest == lowest + 4` logic to an inequality.
+At first I thought maybe I could basically subtly change the `highest == lowest + 4` logic to an inequality.
 One bound of the inequality would of course just `highest == lowest + 4` which obviously corresponds to no gaps at all.
 And the other bound would be if we have maximal gaps (so for example A, 3, 5, 7, 9) which would be equivalent to `highest == lowest + 8`.
 Butttt this would get ruined by a case like (A, 2, 3, 4, 9.)
 So I don't think I can just look at the highest and lowest ranks as above sadly, need just one more `sliding` bro I promise.
-So bascially all I'm going to do is the same as above but for each set of 5 distinct ranks I have I simply check if there's a gap of at most 1.
-I'll also slightly change how I handle the speical Ace High logic since I can't relaly pattern match in the same way as above, I can do this by converting everything to ordinals and if my hand does have an Ace in it I'll add a special ordinal for that Ace that's just one higher than a King's which effectively treats it as high!
+So basically all I'm going to do is the same as above but for each set of 5 distinct ranks I have I simply check if there's a gap of at most 1.
+I'll also slightly change how I handle the special Ace High logic since I can't really pattern match in the same way as above, I can do this by converting everything to ordinals and if my hand does have an Ace in it I'll add a special ordinal for that Ace that's just one higher than a King's which effectively treats it as high!
 
 ```scala
   val aceHighOrdinal = Rank.King.ordinal + 1
@@ -1565,7 +1565,7 @@ It is obvious that we can generalise my `containsGappyStraight` function to add 
   }
 ```
 
-This'll work for the normal starights and gappy straights.
+This'll work for the normal straights and gappy straights.
 And it'll work for bigger gaps too of course.
 As far as I know [^other_jokers] there aren't more powerful versions of the shortcut Joker (some sort of wormhole space warping Joker comes to mind.)
 In fact it might be possible to create such a Wormhole Joker using the [Joker Forge](https://github.com/Jaydchw/joker-forge) but I've not yet looked at it in details!
@@ -1583,7 +1583,7 @@ This obviously took quite some time to run on my computer!
 
 ### Computer Assisted Combinatoric Approach
 
-As discussed this will amount to generalising `countStraightRankSets`, and we can check the results against the brute force approach in the previous section (although to be fair I never actually properly verified the correctness of the vrute force results.)
+As discussed this will amount to generalising `countStraightRankSets`, and we can check the results against the brute force approach in the previous section (although to be fair I never actually properly verified the correctness of the brute force results.)
 As a reminder the final form of `countStraightRankSets` was.
 
 ```scala
@@ -1628,7 +1628,7 @@ end RankSetsWithStraightCounter
 
 The key principal being that we built more complicated straights out of smaller straights.
 So the rules have to change to allow for a greater variety in the base case, we'll have more than the standard 10 starting straights.
-But the rules for adding new cards is actually the same, we know that adding a new distinct rank to an exisiting rank set that already contains a straight automatically gives us a new rank set that must still contain a straight.
+But the rules for adding new cards is actually the same, we know that adding a new distinct rank to an existing rank set that already contains a straight automatically gives us a new rank set that must still contain a straight.
 So the challenge really is finding the "primitive" gappy straights.
 I guess we can simplify by only considering the gappy straights that start with an Ace (e.g. A,2,3,4,5; A,3,4,5,6; ...) and once that's sorted we can apply the same logic to straights starting with 2, right the way up to 10 (there'll still only be one answer starting from 10 of course!)
 Well actually to get straights that start with something other than an Ace we can just increase the rank of all cards by 1 and check that we've not hit an illegal state where the highest card is higher than an Ace but I'm rather getting ahead of myself.
@@ -1704,7 +1704,7 @@ So with a possible gap size of 3 we don't quite have a full quaternary tree sinc
 Anyway I promised some visualisations didn't I!
 Not too long ago I gave a talk that involved trees so I can just recycle some of that old [Doodle](https://www.creativescala.org/doodle/) code to make visualisations here[^claude-disclaimer].
 
-[^claude-disclaimer]: I actually just pointed claude at my old code and told it to modify it a little to make the tree visualisations, which is perhaps a little hypocritical given my previous rant about AI. But in my defence I'd already done the fun part for my talk so a while back.
+[^claude-disclaimer]: I actually just pointed claude at my old code and told it to modify it a little to make the tree visualisations, which is perhaps a little hypocritical given my previous rant about AI. But in my defense I'd already done the fun part for my talk so a while back.
 
 The first visualisation is rather boring , it represents the case where we are not allowed any gaps (i.e. normal straights.)
 So it really is just a chain.
@@ -1730,7 +1730,7 @@ I've not even tried to render the paths under the leaf nodes for this one lol.
 
 I did also actually create an image for the truncated quaternary tree but it's kind of hard to see any of the details so I shan't include it here.
 
-Ok so what we have now is a way of generating all gappy rank sets of 5 that start with an Ace, the next step is to use these kind of like templates to generate startights that start with 2,3,...,10.
+Ok so what we have now is a way of generating all gappy rank sets of 5 that start with an Ace, the next step is to use these kind of like templates to generate straights that start with 2,3,...,10.
 This is precisely what
 
 ```scala
@@ -1756,14 +1756,14 @@ It's kind of hard to put all of this in one image so I'll just show what the sec
 
 And you can imagine what the trees starting with 3 and 4 etc would look like.
 You can also imagine the problem we start to hit when we consider large enough starting numbers, some paths will start trying to go beyond Ace (remember other than the first tree we can consider ace to be high) so we'll have to prune them!
-I think a nice example of these pruned paths will become apparant if we consider starting with 9.
+I think a nice example of these pruned paths will become apparent if we consider starting with 9.
 
 <figure class="wide">
   <img src="/images/gappy-trees/gap-2-from-9.png"/>
 </figure>
 
 As you can see several paths have to be terminated early, we only have 5 legit paths rather than the usual 16.
-So when it comes to writing the code for creating the straights that begin with something other than an Ace I can't just add one to everything in each rank set, I obvioulsy need to get rid of anything that would go beyond Ace.
+So when it comes to writing the code for creating the straights that begin with something other than an Ace I can't just add one to everything in each rank set, I obviously need to get rid of anything that would go beyond Ace.
 To do this it's kind of easier for me to work with ordinals directly rather than the `Rank` data type, here's the code
 
 ```scala
@@ -1871,7 +1871,7 @@ So the previous $S(r)$ is equivalent to $S_0(r)$ and the shortcut Joker is equiv
 
 I think we're finally ready to wire everything together now!
 I'll start with just computing the results for the shortcut joker and then generalise for even bigger gaps, basically to match what I did for the brute force approach.
-We just need something analagous to `StraightCounter`, let's call it `GappyStraightCounter`.
+We just need something analogous to `StraightCounter`, let's call it `GappyStraightCounter`.
 Here it is.
 
 ```scala
@@ -1949,7 +1949,7 @@ I think the tricky and important part of working this out was really in the "Nor
 All I did for gappy straights was generalise the well tested approach for normal straights.
 I think if I had more time I'd have tested the brute force approach out properly but I am fairly certain that it's correct just because I back myself.
 To be honest I don't really have much more to say about gappy straights than I do for normal straights, I used the same techniques I've been using all along for the generalisation: making a plan in my head about what to do before blindly diving in, using recursion, making sure to sense check the output of the smaller functions, etc...
-I think this blog post overall really is about the journey and the most intereting part of the journey is not this section but the normal straights section!
+I think this blog post overall really is about the journey and the most interesting part of the journey is not this section but the normal straights section!
 
 ## Appendix
 
@@ -2002,5 +2002,5 @@ I believe that this formula is correct but it's worth noting that the argument I
 
 - Project Euler [problem 54](https://projecteuler.net/problem=54) is all about poker if you find this post deeply inspirational and would like to solve a different poker related problem
 - Project Euler [problem 76](https://projecteuler.net/problem=76) is basically just asking you to count integer partitions, which is exactly what we were generating for our degeneracy classes (just without our cap of 4 on the parts)
-- Project Euler [problem 78](https://projecteuler.net/problem=78) is about the partition function too but in a classic Project euler move it has been made hard enough that you'd struggle to brute force it.
+- Project Euler [problem 78](https://projecteuler.net/problem=78) is about the partition function too but in a classic Project Euler move it has been made hard enough that you'd struggle to brute force it.
 - Project Euler [problem 31](https://projecteuler.net/problem=31) ("coin sums") is the restricted-parts cousin: partitions where the parts have to come from a fixed set (coin denominations) rather than just being anything from 1 to 4
