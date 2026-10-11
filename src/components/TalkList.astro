@@ -1,0 +1,39 @@
+---
+import { getCollection } from "astro:content";
+
+const talks = (await getCollection("talks")).sort(
+  (a, b) => (b.data.date?.valueOf() ?? 0) - (a.data.date?.valueOf() ?? 0),
+);
+---
+
+<ul class="post-list">
+  {
+    talks.map((talk) => (
+      <li>
+        {/* Trailing slash matters: the slides load their images by relative path. */}
+        <a href={`/talks/${talk.id}/`}>{talk.data.title}</a>
+        <div class="desc">
+          {talk.data.event}
+          {talk.data.post && (
+            <>
+              {" · "}
+              <a href={`/blog/${talk.data.post}/`}>blog post</a>
+            </>
+          )}
+        </div>
+        {talk.data.date ? (
+          <time datetime={talk.data.date.toISOString()}>
+            {talk.data.date.toLocaleDateString("en-GB", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            })}
+          </time>
+        ) : (
+          <span class="date-tbc">date TBC</span>
+        )}
+      </li>
+    ))
+  }
+</ul>
+{talks.length === 0 && <p>No talks yet.</p>}

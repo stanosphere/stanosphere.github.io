@@ -1,0 +1,2111 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sketching Audience Insights</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reset.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/black.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/monokai.css"
+    />
+    <style>
+      :root {
+        --r-heading-font: "Source Sans Pro", Helvetica, sans-serif;
+        --r-main-font: "Source Sans Pro", Helvetica, sans-serif;
+      }
+      .reveal h1,
+      .reveal h2,
+      .reveal h3 {
+        text-transform: none;
+      }
+      .reveal pre {
+        width: 100%;
+        font-size: 0.5em;
+      }
+      .reveal pre code {
+        max-height: 520px;
+        padding: 16px;
+      }
+      .reveal .small-code pre {
+        font-size: 0.42em;
+      }
+      .reveal img {
+        border: none;
+        box-shadow: none;
+        background: none;
+      }
+      .reveal .img-white-bg img {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+      }
+      .reveal .two-col {
+        display: flex;
+        gap: 40px;
+        align-items: center;
+      }
+      .reveal .two-col > * {
+        flex: 1;
+      }
+      .reveal .subtitle {
+        font-size: 0.7em;
+        color: #888;
+        margin-top: 0.5em;
+      }
+      .reveal .highlight-box {
+        background: rgba(66, 133, 244, 0.15);
+        border-left: 4px solid #4285f4;
+        padding: 16px 24px;
+        border-radius: 4px;
+        text-align: left;
+        font-size: 0.8em;
+      }
+      .reveal ul {
+        font-size: 0.85em;
+      }
+      .reveal .full-width {
+        display: flex;
+        justify-content: center;
+      }
+      .reveal .full-width img {
+        max-width: 1200px;
+        max-height: 650px;
+        width: auto;
+        height: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="reveal">
+      <div class="slides">
+        <!-- ============================================ -->
+        <!-- SECTION 1: INTRO                             -->
+        <!-- ============================================ -->
+
+        <section>
+          <h1>Sketching Audience Insights</h1>
+          <p style="font-size: 0.6em; margin-top: 2em">
+            Paul Stanford &middot; Permutive &middot; Scala in the City
+          </p>
+        </section>
+
+        <section>
+          <h2>Contents</h2>
+          <ol>
+            <li>Intro to Permutive</li>
+            <li>Mapping a Customer Problem to a Data Type</li>
+            <li>Toy Sketches</li>
+            <li>Real Sketches</li>
+            <li>Using Sketches with Pinot</li>
+            <li>Putting It All Together</li>
+          </ol>
+        </section>
+
+        <section>
+          <h2>What is Permutive?</h2>
+          <p style="font-size: 0.85em">
+            We help publishers, broadcasters, and advertisers collaborate on
+            data across the open web
+          </p>
+          <ol style="font-size: 0.8em">
+            <li class="fragment">
+              Publishers install our <strong>SDK</strong> on their sites
+            </li>
+            <li class="fragment">
+              SDK captures <strong>page view events</strong> (on-device,
+              privacy-first)
+            </li>
+            <li class="fragment">
+              Events build <strong>cohorts</strong> (e.g. &ldquo;read 3+ cat
+              articles this month&rdquo;)
+            </li>
+            <li class="fragment">
+              Cohorts combine into <strong>audiences</strong> using boolean
+              logic
+            </li>
+            <li class="fragment">
+              <strong>Insights</strong>: understanding your audiences &mdash;
+              reach, engagement, overlap, and more
+            </li>
+          </ol>
+        </section>
+
+        <section>
+          <h2>What is a Cohort?</h2>
+          <p>A group of users defined by a rule</p>
+          <ul>
+            <li class="fragment">
+              <strong>First-party</strong> &mdash; based on behaviour you
+              observe directly <br /><span style="font-size: 0.7em; color: #888"
+                >&ldquo;read 5+ sports articles this month&rdquo;</span
+              >
+            </li>
+            <li class="fragment">
+              <strong>Third-party</strong> (optional) &mdash; from external data
+              providers (demographics, purchase data, interests) <br /><span
+                style="font-size: 0.7em; color: #888"
+                >&ldquo;students aged 18&ndash;24&rdquo; or &ldquo;in-market for
+                a new car&rdquo;</span
+              >
+            </li>
+          </ul>
+        </section>
+
+        <section>
+          <img
+            src="img/permutive/cat_cohort.png"
+            alt="Example cohort definition for cat lovers"
+          />
+        </section>
+
+        <section>
+          <h2>The Data Pipeline</h2>
+          <p>All PageView events end up in <strong>BigQuery</strong></p>
+          <p class="fragment">
+            From there we build <strong>Audience Insights</strong> and
+            <strong>Campaign Insights</strong> to help customers understand
+            their first party data
+          </p>
+        </section>
+
+        <section>
+          <img src="img/permutive/pie_chart.png" alt="Insights pie chart" />
+        </section>
+
+        <section>
+          <h2>Audience Insights</h2>
+          <ul>
+            <li>
+              <strong>Engagement</strong>: unique users, sessions, pageviews,
+              average time spent
+            </li>
+            <li>
+              <strong>Technographics</strong>: device, platform, browser,
+              location
+            </li>
+            <li>
+              <strong>Index &amp; Overlap</strong>: how cohorts compare to each
+              other
+            </li>
+            <li>
+              <strong>Content Read</strong>: which articles, categories, authors
+              resonate
+            </li>
+          </ul>
+        </section>
+
+        <section>
+          <img
+            src="img/permutive/dashboard-example.png"
+            alt="Insights dashboard example"
+            height="600"
+          />
+        </section>
+
+        <section>
+          <h2>Campaign Insights</h2>
+          <p style="font-size: 0.8em">
+            Same metrics, same engine; we just treat campaign IDs as a dimension
+            rather than cohort IDs
+          </p>
+        </section>
+
+        <!-- ============================================ -->
+        <!-- SECTION 2: THE CUSTOMER PROBLEM (JJJ)        -->
+        <!-- ============================================ -->
+
+        <section>
+          <h2>The Daily Bugle</h2>
+          <div class="two-col">
+            <div>
+              <img
+                src="img/jjj/Daily_bugle_logo.webp"
+                alt="Daily Bugle logo"
+                height="200"
+              />
+              <p style="font-size: 0.7em">
+                J. Jonah Jameson wants to monetise his audience
+              </p>
+              <p class="fragment" style="font-size: 0.7em">
+                An advertiser is selling <strong>new webshooters</strong>, they
+                want to reach spider-people from across the spiderverse
+              </p>
+            </div>
+            <div>
+              <p class="fragment" style="font-size: 0.7em">
+                He's going to use <strong>insights</strong> to refine and sense
+                check his audience
+              </p>
+              <img src="img/jjj/JJJ.png" alt="J. Jonah Jameson" height="300" />
+            </div>
+          </div>
+        </section>
+
+        <!-- Stage 1: Spider Lovers ∩ Mask Buyers -->
+
+        <section>
+          <h2>First Attempt</h2>
+          <p>JJJ has two cohorts to start with:</p>
+          <ul>
+            <li>
+              <strong>Spider Lovers</strong>
+              &mdash; 1st party data (read &ge;N spider articles/month)
+            </li>
+            <li>
+              <strong>Mask Buyers</strong>
+              &mdash; 3rd party purchase data
+            </li>
+          </ul>
+        </section>
+
+        <section>
+          <p>
+            JJJ decides that people who like spiders AND buy masks are probably
+            superheroes interested in web shooters
+          </p>
+          <div class="two-col">
+            <div class="img-white-bg fragment">
+              <img src="img/stages/stage1-venn.png" alt="Stage 1 Venn" />
+            </div>
+            <div class="img-white-bg fragment">
+              <img src="img/stages/stage1-tree.png" alt="Stage 1 tree" />
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2>How Do We Model This?</h2>
+          <pre><code class="language-scala" data-trim>
+enum SetExpressionV1[A]:
+  case Value(value: A)
+  case Intersect(left: SetExpressionV1[A], right: SetExpressionV1[A])
+          </code></pre>
+          <pre class="fragment"><code class="language-scala" data-trim>
+Intersect(Value("Spider Lovers"), Value("Mask Buyers"))
+          </code></pre>
+        </section>
+
+        <!-- Stage 2: add Tights Buyers -->
+
+        <section>
+          <h2>But Wait&hellip;</h2>
+          <div class="two-col">
+            <div>
+              <p class="fragment" style="font-size: 0.7em">
+                Within the spiderverse some spider-people only wear masks, some
+                only wear tights. JJJ, being very wise, realises this and
+                decides he must include both!
+              </p>
+              <ul class="fragment" style="font-size: 0.7em">
+                <li>
+                  <strong>Tights Buyers</strong>
+                  &mdash; 3rd party purchase data
+                </li>
+              </ul>
+            </div>
+            <div class="fragment">
+              <img
+                src="img/jjj/spiderman-mask-only.jpg"
+                alt="Spider-Man mask only"
+                height="360"
+                style="margin: 5px"
+              />
+              <img
+                src="img/jjj/spiderman-no-mask.png"
+                alt="Spider-Man without mask"
+                height="360"
+                style="margin: 5px"
+              />
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <div class="two-col">
+            <div class="img-white-bg">
+              <img
+                src="img/stages/stage2-venn.png"
+                alt="Stage 2 Venn"
+                height="350"
+              />
+            </div>
+            <div class="img-white-bg">
+              <img src="img/stages/stage2-tree.png" alt="Stage 2 tree" />
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2>We Need Union</h2>
+          <pre><code class="language-scala" data-trim>
+enum SetExpressionV1[A]:
+  case Value(value: A)
+  case Intersect(left: SetExpressionV1[A], right: SetExpressionV1[A])
+          </code></pre>
+          <pre class="fragment"><code class="language-scala" data-trim>
+enum SetExpressionV2[A]:
+  case Value(value: A)
+  case Intersect(left: SetExpressionV2[A], right: SetExpressionV2[A])
+  case Union(left: SetExpressionV2[A], right: SetExpressionV2[A])
+          </code></pre>
+          <pre class="fragment"><code class="language-scala" data-trim>
+Intersect(
+  Value("Spider Lovers"),
+  Union(
+    Value("Tights Buyers"),
+    Value("Mask Buyers")
+  )
+)
+          </code></pre>
+        </section>
+
+        <!-- Stage 3: add Students -->
+
+        <section>
+          <h2>One More Thing&hellip;</h2>
+          <p style="font-size: 0.7em">
+            Older spider-people probably already have great webshooters from
+            countless years fighting extremely camp villains.
+          </p>
+          <img
+            class="fragment"
+            src="img/jjj/spider-man-villains.jpg"
+            alt="Spider-Man villains"
+            height="250"
+          />
+          <p class="fragment" style="font-size: 0.7em">
+            JJJ decides that he now wants to target students as he thinks they
+            are likely to be considering their first serious webshooter
+            purchase.
+          </p>
+          <ul class="fragment" style="font-size: 0.7em">
+            <li>
+              <strong>Students</strong>
+              &mdash; 3rd party demographic data
+            </li>
+          </ul>
+        </section>
+
+        <section>
+          <div class="img-white-bg">
+            <img
+              src="img/stages/stage3-venn.png"
+              alt="Stage 3 Venn"
+              height="450"
+            />
+          </div>
+        </section>
+
+        <section>
+          <div class="img-white-bg">
+            <img
+              src="img/stages/stage3-binary-tree.png"
+              alt="Stage 3 binary tree"
+            />
+          </div>
+        </section>
+
+        <section>
+          <h2>Rose Trees</h2>
+          <p style="font-size: 0.75em">
+            Binary trees get awkward with 3+ operands so we might as well use
+            Rose Trees instead.
+          </p>
+          <pre><code class="language-scala" data-trim>
+enum SetExpressionV2[A]:
+  case Value(value: A)
+  case Intersect(left: SetExpressionV2[A], right: SetExpressionV2[A])
+  case Union(left: SetExpressionV2[A], right: SetExpressionV2[A])
+          </code></pre>
+          <pre class="fragment"><code class="language-scala" data-trim>
+enum SetExpressionV3[A]:
+  case Value(value: A)
+  case Union(union: List[SetExpressionV3[A]])
+  case Intersect(intersect: List[SetExpressionV3[A]])
+          </code></pre>
+          <pre class="fragment"><code class="language-scala" data-trim>
+Intersect(List(
+  Value("Spider Lovers"),
+  Value("Students"),
+  Union(List(Value("Tights Buyers"), Value("Mask Buyers")))
+))
+          </code></pre>
+        </section>
+
+        <section>
+          <div class="img-white-bg">
+            <img src="img/stages/stage3-tree.png" alt="Stage 3 tree" />
+          </div>
+        </section>
+
+        <!-- V3 → V4: Make illegal states unrepresentable -->
+
+        <section>
+          <h2>Making Illegal States Unrepresentable</h2>
+          <p style="font-size: 0.75em">
+            What does <code>Union(List())</code> or
+            <code>Intersect(List())</code> even mean?
+          </p>
+          <div class="fragment">
+            <img src="img/jjj/nothing_cap.png" alt="Nothing!" height="300" />
+          </div>
+          <p class="fragment" style="font-size: 0.75em">
+            In principle it shouldn't even be possible to express this! So let's
+            make it impossible.
+          </p>
+        </section>
+
+        <section>
+          <h2>Making Illegal States Unrepresentable</h2>
+          <pre><code class="language-scala" data-trim>
+enum SetExpressionV3[A]:
+  case Value(value: A)
+  case Union(union: List[SetExpressionV3[A]])
+  case Intersect(intersect: List[SetExpressionV3[A]])
+          </code></pre>
+          <pre class="fragment"><code class="language-scala" data-trim>
+enum SetExpression[A]:
+  case Value(value: A)
+  case Union(union: NonEmptyList[SetExpression[A]])
+  case Intersect(intersect: NonEmptyList[SetExpression[A]])
+          </code></pre>
+          <p class="fragment" style="font-size: 0.75em">
+            <code>NonEmptyList</code> (from the cats library) guarantees at
+            least one operand at compile time
+          </p>
+        </section>
+
+        <section>
+          <div class="two-col">
+            <div>
+              <p>
+                Here is a picture of a cat that my friend took while we were on
+                holiday that you can see as a reward for me going on about ADTs
+                for ages
+              </p>
+            </div>
+            <div>
+              <img src="img/jjj/cat.jpg" alt="Cat" height="400" />
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2>How Many Possible Queries?</h2>
+          <p>
+            With just 4 cohorts, how many distinct set expressions can we write?
+          </p>
+          <p class="fragment"><strong>52</strong></p>
+        </section>
+
+        <section>
+          <section>
+            <p style="font-size: 0.8em">52 distinct expressions over 4 sets</p>
+            <div class="img-white-bg full-width">
+              <img
+                src="img/gallery/all-4-set-page1.png"
+                alt="4-set Venn diagrams 1-13"
+              />
+            </div>
+          </section>
+          <section>
+            <div class="img-white-bg full-width">
+              <img
+                src="img/gallery/all-4-set-page2.png"
+                alt="4-set Venn diagrams 14-26"
+              />
+            </div>
+          </section>
+          <section>
+            <div class="img-white-bg full-width">
+              <img
+                src="img/gallery/all-4-set-page3.png"
+                alt="4-set Venn diagrams 27-39"
+              />
+            </div>
+          </section>
+          <section>
+            <div class="img-white-bg full-width">
+              <img
+                src="img/gallery/all-4-set-page4.png"
+                alt="4-set Venn diagrams 40-52"
+              />
+            </div>
+          </section>
+          <section>
+            <h2>Let's Organise these Pictures a Bit</h2>
+            <p>
+              We can group them by the total number of regions that are included
+              just because it's fun.
+            </p>
+          </section>
+          <section>
+            <h2>1 region (1 expression)</h2>
+            <div class="img-white-bg full-width">
+              <img src="img/gallery/by-region-1.png" alt="1 shaded region" />
+            </div>
+          </section>
+          <section>
+            <h2>3 regions (6 expressions)</h2>
+            <div class="img-white-bg full-width">
+              <img src="img/gallery/by-region-3.png" alt="3 shaded regions" />
+            </div>
+          </section>
+          <section>
+            <h2>5 regions (12 expressions)</h2>
+            <div class="img-white-bg full-width">
+              <img src="img/gallery/by-region-5.png" alt="5 shaded regions" />
+            </div>
+          </section>
+          <section>
+            <h2>7 regions (7 expressions)</h2>
+            <div class="img-white-bg full-width">
+              <img src="img/gallery/by-region-7.png" alt="7 shaded regions" />
+            </div>
+          </section>
+          <section>
+            <h2>9 regions (7 expressions)</h2>
+            <div class="img-white-bg full-width">
+              <img src="img/gallery/by-region-9.png" alt="9 shaded regions" />
+            </div>
+          </section>
+          <section>
+            <h2>11 regions (12 expressions)</h2>
+            <div class="img-white-bg full-width">
+              <img src="img/gallery/by-region-11.png" alt="11 shaded regions" />
+            </div>
+          </section>
+          <section>
+            <h2>13 regions (6 expressions)</h2>
+            <div class="img-white-bg full-width">
+              <img src="img/gallery/by-region-13.png" alt="13 shaded regions" />
+            </div>
+          </section>
+          <section>
+            <h2>15 regions (1 expression)</h2>
+            <div class="img-white-bg full-width">
+              <img src="img/gallery/by-region-15.png" alt="15 shaded regions" />
+            </div>
+          </section>
+          <section>
+            <h2>The #Distinct Expressions Grows Quickly with the #Cohorts</h2>
+            <table style="font-size: 0.7em">
+              <thead>
+                <tr>
+                  <th>Cohorts</th>
+                  <th>Distinct expressions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1</td>
+                  <td>1</td>
+                </tr>
+                <tr>
+                  <td>2</td>
+                  <td>2</td>
+                </tr>
+                <tr>
+                  <td>3</td>
+                  <td>8</td>
+                </tr>
+                <tr>
+                  <td>4</td>
+                  <td>52</td>
+                </tr>
+                <tr>
+                  <td>5</td>
+                  <td>472</td>
+                </tr>
+                <tr>
+                  <td>6</td>
+                  <td>5,504</td>
+                </tr>
+                <tr>
+                  <td>7</td>
+                  <td>78,416</td>
+                </tr>
+              </tbody>
+            </table>
+            <p class="fragment" style="font-size: 0.6em">
+              <a href="https://oeis.org/A006351">OEIS A006351</a>
+            </p>
+          </section>
+        </section>
+
+        <section>
+          <h2>Something's Missing</h2>
+          <img src="img/something_missing.png" alt="Union flattening" />
+        </section>
+
+        <section>
+          <h2>Something's Missing</h2>
+          <p>
+            We're clearly not representing every possible Venn diagram. I
+            suspect that this is because we don't have
+            <strong>Difference</strong>.
+          </p>
+          <p>How might we change the ADT to add Difference?</p>
+          <pre class="fragment"><code class="language-scala" data-trim>
+enum SetExpression[A]:
+  case Value(value: A)
+  case Union(union: NonEmptyList[SetExpression[A]])
+  case Intersect(intersect: NonEmptyList[SetExpression[A]])
+  case ???
+          </code></pre>
+          <p class="fragment">
+            In a classic move I will leave this as an exercise.
+          </p>
+        </section>
+
+        <!-- ============================================ -->
+        <!-- SECTION 3: optimisation                      -->
+        <!-- ============================================ -->
+
+        <section>
+          <h2>Optimising Set Expressions</h2>
+          <p>
+            It is reasonable to assume that each set operation has some cost
+          </p>
+          <p class="fragment">
+            Fewer operations likely means faster evaluation
+          </p>
+        </section>
+
+        <section>
+          <h2>Optimising Set Expressions</h2>
+          <div class="img-white-bg">
+            <img
+              src="img/optimisation/tree-union-flatten.png"
+              alt="Union flattening"
+            />
+          </div>
+        </section>
+
+        <section>
+          <div class="img-white-bg">
+            <img
+              src="img/optimisation/tree-mixed.png"
+              alt="Mixed expression optimisation"
+            />
+          </div>
+        </section>
+
+        <section>
+          <h2>Optimising Set Expressions</h2>
+          <pre
+            style="font-size: 0.4em"
+          ><code class="language-scala" data-trim data-noescape>
+def optimize[A](expr: SetExpression[A]): SetExpression[A] =
+  expr match {
+    case x @ Value(_) => x
+
+    case Union(xs) =>
+      xs.map(optimize).flatMap {
+        case Union(inner) => inner
+        case other        => NonEmptyList.one(other)
+      } match {
+        case NonEmptyList(head, Nil) => head
+        case flattened               => Union(flattened)
+      }
+
+    case Intersect(xs) =>
+      xs.map(optimize).flatMap {
+        case Intersect(inner) => inner
+        case other            => NonEmptyList.one(other)
+      } match {
+        case NonEmptyList(head, Nil) => head
+        case flattened               => Intersect(flattened)
+      }
+  }
+          </code></pre>
+        </section>
+
+        <section>
+          <h2>General vs Specialised optimisation</h2>
+          <p>
+            This optimisation works on <code>SetExpression[A]</code> for
+            <em>any</em> <code>A</code>
+          </p>
+          <p class="fragment" style="font-size: 0.75em">
+            I think it's cool that this optimisation works even though we know
+            absolutely nothing about the underlying sets!
+          </p>
+          <p class="fragment" style="font-size: 0.75em">
+            But once we know what <code>A</code> is, we may be able to do even
+            more
+          </p>
+          <p class="fragment" style="font-size: 0.75em">
+            A more constrained type can potentially unlock more specialised
+            optimisations based on how the sets are actually stored and queried
+          </p>
+          <p class="fragment" style="font-size: 0.75em">
+            (more on this later&hellip;)
+          </p>
+        </section>
+
+        <!-- ============================================ -->
+        <!-- SECTION 4: WHAT SHOULD A BE?                 -->
+        <!-- ============================================ -->
+
+        <section>
+          <h2>The Question</h2>
+          <p>
+            JJJ needs to show the advertiser that this audience is
+            <strong>big enough</strong>
+          </p>
+          <p class="fragment">
+            &ldquo;How many <strong>unique users</strong> are in this
+            audience?&rdquo;
+          </p>
+          <p class="fragment">
+            We need to <em>evaluate</em> a <code>SetExpression</code> &mdash;
+            but what should <code>A</code> be?
+          </p>
+        </section>
+
+        <section>
+          <h2>Naive Approach: Set[UserId]</h2>
+          <pre><code class="language-scala" data-trim>
+type Audience = SetExpression[Set[UserId]]
+          </code></pre>
+          <ul>
+            <li class="fragment">Query BigQuery for each cohort's user IDs</li>
+            <li class="fragment">
+              Compute intersections and unions on <code>Set[UserId]</code>
+            </li>
+            <li class="fragment">Count the result</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>But Let's Not Because...</h2>
+          <ul>
+            <li>Cohorts can have <strong>millions</strong> of user IDs</li>
+            <li class="fragment">
+              BigQuery queries are slow and expensive at this scale
+            </li>
+            <li class="fragment">
+              Complex set operations over millions of elements can get a bit mad
+            </li>
+            <li class="fragment">
+              Doesn't scale as cohort count grows or if we look over larger time
+              periods
+            </li>
+          </ul>
+        </section>
+
+        <!-- ============================================ -->
+        <!-- SECTION 6: DATA SKETCHES — THE THEORY        -->
+        <!-- ============================================ -->
+
+        <section>
+          <h2>The Counting Problem</h2>
+          <p>
+            How do you count <strong>distinct</strong> users across billions of
+            events?
+          </p>
+          <ul>
+            <li class="fragment">
+              Count exactly: store every user ID &rarr; huge memory
+            </li>
+            <li class="fragment">
+              Count approximately:
+              <strong>probabilistic data structures</strong>
+            </li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>The Plan</h2>
+          <p>Let&rsquo;s build a toy <code>ApproxSet</code> from scratch</p>
+          <ul>
+            <li class="fragment">Start with just counting</li>
+            <li class="fragment">Worry about intersections and unions later</li>
+            <li class="fragment">
+              There's nothing better than having a go at something by yourself
+              (and inevitably getting it horribly wrong) for building intuition
+            </li>
+          </ul>
+        </section>
+
+        <section>
+          <img
+            src="img/tube-carriage/barbican-station.jpg"
+            alt="Barbican station"
+          />
+        </section>
+
+        <section>
+          <h2>A Mathematical Tube Carriage</h2>
+          <img
+            class="fragment"
+            src="img/tube-carriage/sparse-tube-carriage-no-annotation.png"
+            alt="Tube carriage"
+          />
+          <p class="fragment">
+            Imagine respectfully standing in a tube carriage
+          </p>
+          <p class="fragment">
+            Your headphones have broken and you're not the sort of person who
+            plays your TikToks out loud so to pass the time you decide to
+            estimate how many people are in your carriage
+          </p>
+        </section>
+
+        <section>
+          <h2>Sparse vs Packed</h2>
+          <img
+            src="img/tube-carriage/sparse-vs-dense-tube-carriage-no-annotation.png"
+            alt="Sparse vs dense tube carriage"
+          />
+          <p class="fragment">
+            You figure that if people are packed closely together there are
+            probably loads of them in carriage
+          </p>
+        </section>
+
+        <section>
+          <h2>Take a Sample</h2>
+          <p style="font-size: 0.75em">
+            You can only really see the people who happen to be close to you on
+            the tube so you use them as your sample
+          </p>
+
+          <img
+            class="fragment"
+            src="img/tube-carriage/sparse-carriage-with-sample-highlighted.png"
+            alt="Carriage with sampled region highlighted"
+          />
+          <p class="fragment" style="font-size: 0.75em">
+            Since this is a silly contrived analogy you could sample from
+            anywhere, but let's always take the leftmost $k$ people
+          </p>
+        </section>
+
+        <section>
+          <h2>Take a Sample</h2>
+          <p style="font-size: 0.75em">
+            This is true for a densely packed tube carriage too, so the sample
+            in such a carriage would look like this
+          </p>
+
+          <img
+            class="fragment"
+            src="img/tube-carriage/dense-carriage-with-sample-highlighted.png"
+            alt="Carriage with sampled region highlighted"
+          />
+          <p class="fragment" style="font-size: 0.75em">
+            As with the sparse carriage $k = 3$ in this diagram
+          </p>
+        </section>
+
+        <section>
+          <h2>Take a Sample</h2>
+          <p style="font-size: 0.75em">
+            You bravely ask the people near you how far away from the left side
+            of the carriage they are
+          </p>
+
+          <img
+            class="fragment"
+            src="img/tube-carriage/sparse-carriage-with-dist-labels.png"
+            alt="Carriage with sampled region highlighted"
+          />
+          <p class="fragment" style="font-size: 0.75em">
+            None of them think this is a strange ask at all and the $k$th person
+            happily tells you they are at a distance $x_k$ from the LHS
+          </p>
+        </section>
+
+        <section>
+          <h2>The (Extremely Hand Wavy) Maths</h2>
+          <p>
+            Now that you have the distances you can work out on average how
+            close together people are standing to each other. Using this
+            "average gap" you can work out roughly how many people are in the
+            carriage by dividing the length of the carriage by this average gap
+          </p>
+        </section>
+
+        <section>
+          <h2>The (Extremely Hand Wavy) Maths</h2>
+          <p>Our $k$ people stand at positions $x_1, x_2, \ldots, x_k$</p>
+          <p class="fragment">The $k$ gaps are:</p>
+          <div class="fragment" style="font-size: 0.7em">
+            $$(x_1 - 0) + (x_2 - x_1) + (x_3 - x_2) + \cdots + (x_k - x_{k-1})$$
+          </div>
+        </section>
+
+        <section>
+          <h2>The (Extremely Hand Wavy) Maths</h2>
+          <p>Almost everything cancels:</p>
+          <div style="font-size: 0.7em">
+            $$(\textcolor{red}{x_1} - 0) + (\textcolor{green}{x_2} -
+            \textcolor{red}{x_1}) + (\textcolor{orange}{x_3} -
+            \textcolor{green}{x_2}) + \cdots + (x_k -
+            \textcolor{cyan}{x_{k-1}})$$
+          </div>
+          <p class="fragment">Total gap $= x_k$</p>
+          <p class="fragment">Average gap $= \dfrac{x_k}{k}$</p>
+        </section>
+
+        <section>
+          <h2>The Estimate</h2>
+          <p>Estimated count = total length / average gap:</p>
+          <p>
+            $$\hat{N} = \frac{\text{length}}{\text{average gap}} =
+            \frac{\text{length} \cdot k}{x_k}$$
+          </p>
+          <p class="fragment">
+            But then we remember that this is a very special mathematical tube
+            carriage that has a length of $1$, so:
+          </p>
+          <p class="fragment">$$\boxed{\hat{N} = \frac{k}{x_k}}$$</p>
+        </section>
+
+        <!-- ApproxSet V1: just cardinality estimation, no set operations -->
+
+        <section>
+          <h2>What Do We Need for Our ApproxSet Data Type?</h2>
+          <p>We have an estimator: $\hat{N} = k / x_k$</p>
+          <p class="fragment" style="font-size: 0.9em">
+            Now we need a data structure that keeps only the
+            <strong>$k$ smallest</strong> distances we've seen. A sorted set
+            basically gets us halfway there, we just need to ensure that it is
+            bounded!
+          </p>
+          <p class="fragment" style="font-size: 0.9em">
+            If the set is full and someone tries to add an element (that is
+            smaller than the largest element in the set) we shall evict the
+            largest element from the set to make room!
+          </p>
+        </section>
+
+        <section>
+          <h2>Building Block: BoundedSortedSet</h2>
+          <pre><code class="language-scala" data-trim data-noescape>
+case class BoundedSortedSet[A: Ordering](
+    maxSize: Int,
+    underlying: SortedSet[A]
+) {
+  def +(elem: A): BoundedSortedSet[A] =
+    if underlying.size >= maxSize && elem >= underlying.last
+    then this   // above threshold, skip
+    else
+      val updated = underlying + elem
+      if updated.size > maxSize
+      then copy(underlying = updated - updated.last)
+      else copy(underlying = updated)
+}
+          </code></pre>
+          <p class="fragment" style="font-size: 0.75em">
+            A sorted set that only keeps the smallest <code>k</code> elements
+          </p>
+        </section>
+
+        <section>
+          <h2>BoundedSortedSet: Set Operations</h2>
+          <pre><code class="language-scala" data-trim data-noescape>
+def union(that: BoundedSortedSet[A]): BoundedSortedSet[A] =
+  val newMaxSize = math.min(this.maxSize, that.maxSize)
+  val merged = this.underlying.union(that.underlying).take(newMaxSize)
+  BoundedSortedSet(newMaxSize, merged)
+
+def intersect(that: BoundedSortedSet[A]): BoundedSortedSet[A] =
+  val newMaxSize = math.min(this.maxSize, that.maxSize)
+  val common = this.underlying.intersect(that.underlying)
+  BoundedSortedSet(newMaxSize, common)
+          </code></pre>
+        </section>
+
+        <section>
+          <h2>From Tube Carriages to Code</h2>
+          <p>Our estimator needs numbers in $[0, 1)$</p>
+          <p class="fragment">
+            But real data is strings, UUIDs, user IDs&hellip;
+          </p>
+          <p class="fragment">
+            <strong>Hash</strong> each element to map it into $[0, 1)$
+          </p>
+          <pre class="fragment"><code class="language-scala" data-trim>
+def hashToUnitInterval(value: String): Double =
+  (value.hashCode & Int.MaxValue).toDouble / Int.MaxValue
+          </code></pre>
+          <div class="highlight-box fragment" style="font-size: 0.65em">
+            In production you would use a more serious hash function such as
+            MurmurHash3, as <code>String.hashCode</code> has poor distribution
+            for short inputs
+          </div>
+        </section>
+
+        <section>
+          <h2>ApproxSet V1</h2>
+          <pre><code class="language-scala" data-trim data-noescape>
+case class ApproxSet(hashedSample: BoundedSortedSet[Double]) {
+
+  def +(item: String): ApproxSet =
+    ApproxSet(hashedSample + hashToUnitInterval(item))
+
+  def estimate: Double =
+    hashedSample.underlying.size.toDouble / hashedSample.underlying.last
+}
+          </code></pre>
+          <ul>
+            <li class="fragment">Hash each element to [0, 1)</li>
+            <li class="fragment">Keep the smallest $k$ hashes</li>
+            <li class="fragment">
+              Estimate = $k / x_k$ &mdash; just like the tube carriage!
+            </li>
+          </ul>
+        </section>
+
+        <!-- ApproxSet V2: add union and intersection (naive, implicit threshold) -->
+
+        <section>
+          <h2>ApproxSet V2: Set Operations</h2>
+          <p>
+            Sketches support union and intersection, we just run the operations
+            on the retained hashes
+          </p>
+          <pre><code class="language-scala" data-trim data-noescape>
+case class ApproxSet(hashedSample: BoundedSortedSet[Double]) {
+  // ... + and estimate as before ...
+
+  def union(that: ApproxSet): ApproxSet =
+    ApproxSet(this.hashedSample.union(that.hashedSample))
+
+  def intersect(that: ApproxSet): ApproxSet =
+    ApproxSet(this.hashedSample.intersect(that.hashedSample))
+}
+          </code></pre>
+        </section>
+
+        <!-- ApproxSet V3: explicit threshold fixes set operations -->
+
+        <section>
+          <section>
+            <h2>Measuring the Bias</h2>
+            <p style="font-size: 0.8em">Utility functions</p>
+            <pre
+              style="font-size: 0.4em"
+            ><code class="language-scala" data-trim>
+def randomUUIDs(n: Int): List[String] =
+  List.fill(n)(java.util.UUID.randomUUID().toString)
+
+def averageOver(trials: Int)(runTrial: => Double): Double =
+  (1 to trials).toList.foldMap(_ => runTrial) / trials
+            </code></pre>
+          </section>
+
+          <section>
+            <h2>Single Sketch Error</h2>
+            <pre
+              style="font-size: 0.4em"
+            ><code class="language-scala" data-trim>
+def singleSketchError(maxSize: Int, setSize: Int): Double = {
+  val data = randomUUIDs(setSize)
+  val approxSet = ApproxSet.fromList(data, maxSize)
+
+  (approxSet.estimate - setSize) / setSize
+}
+            </code></pre>
+          </section>
+
+          <section>
+            <h2>Intersection Error</h2>
+            <pre
+              style="font-size: 0.4em"
+            ><code class="language-scala" data-trim>
+// two sets of the same size with an overlap fraction
+def intersectionError(maxSize: Int, setSize: Int, overlapFraction: Double): Double = {
+  val pool = randomUUIDs(setSize * 2)
+  val overlapSize = (setSize * overlapFraction).toInt
+
+  val setA = pool.take(setSize)
+  val setB = pool.drop(setSize - overlapSize).take(setSize)
+
+  val approxSetA = ApproxSet.fromList(setA, maxSize)
+  val approxSetB = ApproxSet.fromList(setB, maxSize)
+  val intersection = approxSetA `intersect` approxSetB
+
+  val est = Try(intersection.estimate).getOrElse(0d)
+
+  (est - overlapSize) / overlapSize
+}
+            </code></pre>
+          </section>
+
+          <section>
+            <h2>Union Error</h2>
+            <pre
+              style="font-size: 0.4em"
+            ><code class="language-scala" data-trim>
+// two disjoint sets of different sizes
+def unionError(maxSize: Int, setSizeA: Int, setSizeB: Int): Double = {
+  val exactUnionSize = setSizeA + setSizeB
+  val pool = randomUUIDs(setSizeA + setSizeB)
+  val setA = pool.take(setSizeA)
+  val setB = pool.drop(setSizeA)
+
+  val approxSetA = ApproxSet.fromList(setA, maxSize)
+  val approxSetB = ApproxSet.fromList(setB, maxSize)
+  val union = approxSetA `union` approxSetB
+
+  (union.estimate - exactUnionSize) / exactUnionSize
+}
+            </code></pre>
+          </section>
+        </section>
+
+        <section>
+          <h2>Systematic Bias</h2>
+          <p style="font-size: 0.8em">
+            V2 consistently overestimates (averaged over 1000 trials)
+          </p>
+          <table style="font-size: 0.65em">
+            <thead>
+              <tr>
+                <th>Scenario</th>
+                <th>V2 avg error</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Single sketch (100k)</td>
+                <td>+0.32%</td>
+              </tr>
+              <tr>
+                <td>Single sketch (10k)</td>
+                <td>+0.37%</td>
+              </tr>
+              <tr>
+                <td>Intersection (50% overlap)</td>
+                <td>+0.75%</td>
+              </tr>
+              <tr>
+                <td>Intersection (10% overlap)</td>
+                <td><strong>+4.26%</strong></td>
+              </tr>
+            </tbody>
+          </table>
+          <p class="fragment" style="font-size: 0.75em">
+            The bias grows with sparser intersections
+          </p>
+        </section>
+
+        <section>
+          <h2>Systematic Bias</h2>
+          <p>
+            The reason for this is essentially an off by one error in my
+            extremely hand wavy mathematical treatment earlier
+          </p>
+          <p class="fragment">
+            Essentially I should have been counting the people rather than the
+            gaps!
+          </p>
+          <p class="fragment">
+            But we still need to know when to exclude hashes from our bounded
+            set. So we can keep track of a hash that's larger than all hashes in
+            our sample, and call this threshold $\theta$
+          </p>
+        </section>
+
+        <section>
+          <img
+            src="img/tube-carriage/sparse-carriage-introducing-theta.png"
+            alt="Tube carriage introducing theta"
+          />
+        </section>
+
+        <section>
+          <h2>Explicitly Tracking The Threshold</h2>
+
+          <p>
+            So as well as the sample of hashes from before we're just tracking
+            one more thing: $\theta$. $\theta$ is our threshold, all hashes
+            retained in our sample must be $< \theta$.
+          </p>
+          <p class="fragment">
+            When we end up evicting a hash for daring to be too big we set our
+            new threshold value to be the value of the evicted hash.
+          </p>
+          <p class="fragment">
+            So let's see how this changes our lovely data type!
+          </p>
+        </section>
+
+        <section>
+          <section>
+            <h2>New: addAndReturnEvicted</h2>
+            <pre
+              style="font-size: 0.4em"
+            ><code class="language-scala" data-trim data-noescape>
+// added to BoundedSortedSet
+def addAndReturnEvicted(elem: A): (BoundedSortedSet[A], Option[A]) =
+  if underlying.size >= maxSize && elem >= underlying.last then (this, None)
+  else {
+    val updated = underlying + elem
+    if updated.size > maxSize then
+      val evicted = updated.last
+      (copy(underlying = updated - evicted), Some(evicted))
+    else
+      (copy(underlying = updated), None)
+  }
+            </code></pre>
+          </section>
+
+          <section>
+            <h2>ApproxSet V3</h2>
+            <pre
+              style="font-size: 0.4em"
+            ><code class="language-scala" data-trim data-noescape>
+object ApproxSetV3 {
+  def empty(maxSampleSize: Int): ApproxSetV3 =
+    ApproxSetV3(threshold = 1.0, BoundedSortedSet.empty(maxSampleSize))
+}
+
+case class ApproxSetV3(
+    threshold: Double,
+    hashes: BoundedSortedSet[Double],
+) {
+  def +(item: String): ApproxSetV3 = {
+    val hash = hashToUnitInterval(item)
+    if hash >= threshold then this
+    else {
+      val (updated, evicted) = hashes.addAndReturnEvicted(hash)
+      copy(threshold = evicted.getOrElse(threshold), hashes = updated)
+    }
+  }
+
+  def estimate: Double =
+    if hashes.underlying.isEmpty then 0.0
+    else hashes.underlying.size.toDouble / threshold
+}
+            </code></pre>
+          </section>
+
+          <section>
+            <h2>ApproxSet V3: Set Operations</h2>
+            <pre
+              style="font-size: 0.4em"
+            ><code class="language-scala" data-trim data-noescape>
+  def union(that: ApproxSetV3): ApproxSetV3 = {
+    val minThreshold = math.min(this.threshold, that.threshold)
+    val merged = (this.hashes.underlying ++ that.hashes.underlying).filter(_ < minThreshold)
+    val newMaxSize = math.min(this.hashes.maxSize, that.hashes.maxSize)
+    if merged.size <= newMaxSize
+    then ApproxSetV3(minThreshold, BoundedSortedSet(newMaxSize, merged))
+    else
+      val kept = merged.take(newMaxSize + 1)
+      val newThreshold = kept.last
+      ApproxSetV3(newThreshold, BoundedSortedSet(newMaxSize, kept - newThreshold))
+  }
+
+  def intersect(that: ApproxSetV3): ApproxSetV3 = {
+    val newThreshold = math.min(this.threshold, that.threshold)
+    val common = this.hashes.underlying.intersect(that.hashes.underlying)
+      .filter(_ < newThreshold)
+    val newMaxSize = math.min(this.hashes.maxSize, that.hashes.maxSize)
+    ApproxSetV3(newThreshold, BoundedSortedSet(newMaxSize, common))
+  }
+            </code></pre>
+          </section>
+
+          <section>
+            <img
+              src="img/tube-carriage/combing-sketches-with-different-densities.png"
+              alt="Combining sketches with different densities"
+            />
+          </section>
+
+          <section>
+            <p style="font-size: 0.75em">
+              Note: we could theoretically model this as a
+              <code>BoundedSortedSet</code>
+              with $k + 1$ elements rather than $k$, where the largest element
+              is always the threshold. We&rsquo;ve chosen to use an explicit
+              <code>threshold</code> field to make the intent clearer.
+            </p>
+          </section>
+        </section>
+
+        <section>
+          <h2>V3 Fixes the Bias</h2>
+          <table style="font-size: 0.65em">
+            <thead>
+              <tr>
+                <th>Scenario</th>
+                <th>V2 avg error</th>
+                <th>V3 avg error</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Single sketch (100k)</td>
+                <td>+0.32%</td>
+                <td>-0.08%</td>
+              </tr>
+              <tr>
+                <td>Single sketch (10k)</td>
+                <td>+0.37%</td>
+                <td>-0.01%</td>
+              </tr>
+              <tr>
+                <td>Intersection (50% overlap)</td>
+                <td>+0.75%</td>
+                <td>-0.02%</td>
+              </tr>
+              <tr>
+                <td>Intersection (10% overlap)</td>
+                <td><strong>+4.26%</strong></td>
+                <td>+0.19%</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section>
+          <div class="highlight-box">
+            In production we use Apache DataSketches which has a battle-tested,
+            optimised implementation of theta sketches with rigorous error
+            bounds. My
+            <code>ApproxSet</code> is essentially a simplified theta sketch.
+          </div>
+        </section>
+
+        <section>
+          <h2>Accuracy Guarantees</h2>
+          <p>Real theta sketches have well-understood error bounds</p>
+          <p class="fragment">
+            RMS (Root Mean Square) relative error $\approx \dfrac{1}{\sqrt{k}}$
+          </p>
+          <p class="fragment" style="font-size: 0.75em">
+            With $k = 4096$: error $\approx 1.6\%$
+          </p>
+          <p class="fragment" style="font-size: 0.75em">
+            With $k = 16384$: error $\approx 0.8\%$
+          </p>
+        </section>
+
+        <section>
+          <h2>Even More Food for Thought</h2>
+          <p>Remember set difference from earlier?</p>
+          <p class="fragment">
+            Theta sketches support it too. How would you implement it on
+            <code>ApproxSet</code>?
+          </p>
+          <p class="fragment">
+            Once again this is left as an exercise which I'm sure everyone will
+            do
+          </p>
+        </section>
+
+        <section>
+          <div class="two-col">
+            <div>
+              <p>
+                Here is another picture of a cat that my friend took while we
+                were on holiday. I feel another reward is needed for getting
+                through the <code>ApproxSet</code> code! This picture was taken
+                on the UNESCO International Day For Monuments and Sites. What a
+                day.
+              </p>
+            </div>
+            <div>
+              <img
+                src="img/unesco-cat.png"
+                alt="Cat"
+                style="object-fit: contain"
+              />
+            </div>
+          </div>
+        </section>
+
+        <!-- ============================================ -->
+        <!-- SECTION 7: THE OLD SYSTEM                    -->
+        <!-- ============================================ -->
+
+        <section>
+          <h3>The Old System: Stream Analytics</h3>
+
+          <img
+            src="img/architecture/old-system.png"
+            alt="Old system architecture"
+          />
+        </section>
+
+        <section>
+          <h2>What Went Wrong</h2>
+          <ul>
+            <li>
+              Slow dashboards &mdash; the query layer had to locate,
+              deserialise, and merge sketches across stores
+            </li>
+            <li class="fragment">Compaction costs grew with data volume</li>
+            <li class="fragment">
+              Very hard to recover when things went wrong
+            </li>
+          </ul>
+        </section>
+
+        <!-- ============================================ -->
+        <!-- SECTION 8: APACHE PINOT                      -->
+        <!-- ============================================ -->
+
+        <section>
+          <h2>Apache Pinot</h2>
+          <p>
+            A real-time OLAP database with
+            <strong>native sketch support</strong>
+          </p>
+          <ul style="font-size: 0.8em">
+            <li class="fragment">Already proven useful in our Plans product</li>
+            <li class="fragment">Handles compaction automatically</li>
+            <li class="fragment">
+              Just write SQL to query it, this is easier to understand and debug
+              than getting sketches from like four different possible places
+            </li>
+            <li class="fragment">
+              Large time-range queries work out of the box
+            </li>
+            <li class="fragment">
+              <code>distinctCountRawThetaSketch()</code> &mdash; aggregates
+              sketches server-side (unions the sketches)
+            </li>
+            <li class="fragment">Sub-second query latency at scale</li>
+          </ul>
+        </section>
+
+        <section>
+          <section>
+            <h2>Permutive OSS Contributions to Pinot</h2>
+            <img
+              src="img/permutive/pinot-prs-1.png"
+              alt="Permutive PRs to Apache Pinot"
+            />
+          </section>
+          <section>
+            <img
+              src="img/permutive/pinot-prs-2.png"
+              alt="More Permutive PRs to Apache Pinot"
+            />
+          </section>
+        </section>
+
+        <section>
+          <section>
+            <h2>The New System</h2>
+            <img
+              src="img/architecture/new-system-low-detail.png"
+              alt="New system overview"
+            />
+          </section>
+          <section>
+            <img
+              src="img/architecture/new-system-medium-detail.png"
+              alt="New system detail"
+            />
+          </section>
+        </section>
+
+        <section>
+          <h2>Performance: Time Range</h2>
+          <p style="font-size: 0.8em">
+            Single cohort, varying time period (1&ndash;9 months)
+          </p>
+          <p style="font-size: 0.7em; color: #888">
+            Average response time over 5 requests
+          </p>
+          <img
+            src="img/benchmarks/query-performance-against-different-time-periods.png"
+            alt="Query performance vs time range"
+            height="400"
+          />
+        </section>
+
+        <section>
+          <h2>Performance: Cohort Count</h2>
+          <p style="font-size: 0.8em">
+            One month time period, varying number of cohorts (1&ndash;20)
+          </p>
+          <p style="font-size: 0.7em; color: #888">
+            Average response time over 5 requests
+          </p>
+          <img
+            src="img/benchmarks/query-performance-against-number-of-cohorts.png"
+            alt="Query performance vs cohort count"
+            height="400"
+          />
+        </section>
+
+        <!-- ============================================ -->
+        <!-- SECTION 9: PUTTING IT ALL TOGETHER           -->
+        <!-- ============================================ -->
+
+        <section>
+          <section>
+            <h2>A Real Query</h2>
+            <p>
+              The end is in sight. Given everything we've seen: the
+              <code>SetExpression</code> datatype, Theta Sketches, and Pinot
+              let's have a look at how a real insights query works!
+            </p>
+            <p class="fragment">Let's look at that dashboard again</p>
+          </section>
+
+          <section>
+            <img
+              src="img/permutive/dashboard-example.png"
+              alt="Insights dashboard"
+              height="600"
+            />
+          </section>
+
+          <section>
+            <h2>The Full Pipeline</h2>
+            <ol style="font-size: 0.8em">
+              <li>HTTP request arrives with a set expression</li>
+              <li>Parse &amp; resolve segment names to Pinot identifiers</li>
+              <li>
+                Fetch sketches from Pinot (in parallel via
+                <code>parTraverse</code>)
+              </li>
+              <li>Evaluate the expression tree over sketches</li>
+              <li>Compute confidence intervals</li>
+              <li>Return cardinality estimate</li>
+            </ol>
+            <pre class="fragment"><code class="language-scala" data-trim>
+SetExpression[SegmentName]   // what the client sends
+  ↓ resolve
+SetExpression[PinotIdentifier]  // what we query Pinot with
+  ↓ fetch + evaluate
+ThetaBasedSketch             // the answer
+  ↓ estimate
+CardinalityEstimate          // what the client gets back
+            </code></pre>
+          </section>
+
+          <section>
+            <h2>A Real Query</h2>
+            <p>
+              This real query has two cohorts, two country filters, one platform
+              filter, and is over large time range
+            </p>
+            <p class="fragment">
+              In the world of sketches a filter is applied as an intersection
+            </p>
+          </section>
+
+          <section>
+            <h2>Recall the Final Form of the SetExpression</h2>
+            <pre><code class="language-scala" data-trim>
+enum SetExpression[A]:
+  case Value(value: A)
+  case Union(union: NonEmptyList[SetExpression[A]])
+  case Intersect(intersect: NonEmptyList[SetExpression[A]])
+            </code></pre>
+          </section>
+
+          <section>
+            <h2>A Real Query</h2>
+            <p>Here is what the <code>SetExpression</code> looks like</p>
+            <pre
+              style="font-size: 0.4em"
+            ><code class="language-scala" data-trim>
+intersect(
+  union(
+    value("country = USA"),
+    value("country = Canada")
+  ),
+  value("platform = Web"),
+  union(
+    value("cohort = Moderately Engaged Readers"),
+    value("cohort = Interest - Natural Science")
+  )
+)
+            </code></pre>
+            <pre
+              class="fragment"
+              style="font-size: 0.35em"
+            ><code class="language-scala" data-trim>
+// helper functions for readability
+def value[A](x: A): SetExpression[A] =
+  SetExpression.Value(x)
+
+def union[A](xs: SetExpression[A]*): SetExpression[A] =
+  SetExpression.Union(NonEmptyList.fromListUnsafe(xs.toList))
+
+def intersect[A](xs: SetExpression[A]*): SetExpression[A] =
+  SetExpression.Intersect(NonEmptyList.fromListUnsafe(xs.toList))
+            </code></pre>
+          </section>
+
+          <section>
+            <h2>Specialised Optimisation</h2>
+            <p style="font-size: 0.75em">
+              Remember &ldquo;once we know what <code>A</code> is, we can do
+              more&rdquo;?
+            </p>
+            <p class="fragment" style="font-size: 0.75em">
+              The two country values share the same Pinot table and metric
+              &mdash; combine their filters into one
+              <code>PinotIdentifier</code>
+            </p>
+            <pre
+              class="fragment"
+              style="font-size: 0.38em"
+            ><code class="language-scala" data-trim>
+// pseudo-code
+
+// Before: two separate values, two Pinot queries
+union(
+  value(PinotIdentifier(table=GeoInfo, filter=country:USA)),
+  value(PinotIdentifier(table=GeoInfo, filter=country:Canada))
+)
+
+// After: one value, one Pinot query — Pinot unions the sketches for us
+value(PinotIdentifier(table=GeoInfo, filters={country:USA, country:Canada}))
+            </code></pre>
+          </section>
+
+          <section>
+            <h2>Simplifying the Expression</h2>
+            <p style="font-size: 0.75em">
+              The fact that Pinot itself can union sketches together allows us
+              to simplify our set expression in some cases
+            </p>
+            <div class="two-col fragment">
+              <div>
+                <p style="font-size: 0.65em"><strong>Before</strong></p>
+                <pre
+                  style="font-size: 0.35em"
+                ><code class="language-scala" data-trim>
+intersect(
+  union(
+    value("country = USA"),
+    value("country = Canada")
+  ),
+  value("platform = Web"),
+  union(
+    value("cohort = Moderately Engaged Readers"),
+    value("cohort = Interest - Natural Science")
+  )
+)
+                </code></pre>
+              </div>
+              <div>
+                <p style="font-size: 0.65em"><strong>After</strong></p>
+                <pre
+                  style="font-size: 0.35em"
+                ><code class="language-scala" data-trim>
+intersect(
+  value("country = USA | Canada"),
+  value("platform = Web"),
+  value("cohort = Moderately Engaged Readers | Interest - Natural Science")
+)
+                </code></pre>
+              </div>
+            </div>
+          </section>
+
+          <section>
+            <h2>Evaluation Strategy</h2>
+            <p style="font-size: 0.75em">How do we evaluate the expression?</p>
+            <ul style="font-size: 0.7em">
+              <li class="fragment">
+                <strong>Fetch all sketches up front</strong>, then evaluate the
+                tree in memory
+              </li>
+              <li class="fragment">
+                Fetch lazily as we walk the tree (evaluate as we go)
+              </li>
+              <li class="fragment">Something clever in between</li>
+            </ul>
+            <p class="fragment" style="font-size: 0.75em">
+              I chose option 1 since experimentally it worked better than option
+              2. It is also rather straightforward and so, easy to reason about,
+              and lets us fetch in parallel with <code>parTraverse</code>.
+              <code>foldMap</code> collects all leaf values regardless of tree
+              shape
+            </p>
+          </section>
+
+          <section>
+            <h2>Collecting Identifiers</h2>
+            <pre><code class="language-scala" data-trim>
+val expression: SetExpression[PinotIdentifier] = ???
+
+// .toList flattens the tree into its leaf values
+// regardless of the union/intersect structure
+val uniqueIdentifiers: Set[PinotIdentifier] =
+  expression.toList.toSet
+            </code></pre>
+            <p class="fragment" style="font-size: 0.75em">
+              This is the <code>NonEmptyTraverse</code> instance at work
+            </p>
+          </section>
+
+          <section>
+            <h2>The Implementation</h2>
+            <pre
+              style="font-size: 0.38em"
+            ><code class="language-scala" data-trim data-noescape>
+given NonEmptyTraverse[SetExpression] = new NonEmptyTraverse[SetExpression] {
+  override def nonEmptyTraverse[G[_]: Apply, A, B](
+    fa: SetExpression[A]
+  )(f: A => G[B]): G[SetExpression[B]] =
+    fa match {
+      case Value(value)        => f(value).map(Value.apply)
+      case Union(operands)     => operands.nonEmptyTraverse(_.nonEmptyTraverse(f)).map(Union.apply)
+      case Intersect(operands) => operands.nonEmptyTraverse(_.nonEmptyTraverse(f)).map(Intersect.apply)
+    }
+
+  override def foldLeft[A, B](fa: SetExpression[A], b: B)(f: (B, A) => B): B =
+    fa match {
+      case Value(value)        => f(b, value)
+      case Union(operands)     => operands.foldLeft(b)((acc, ex) => foldLeft(ex, acc)(f))
+      case Intersect(operands) => operands.foldLeft(b)((acc, ex) => foldLeft(ex, acc)(f))
+    }
+
+  // + reduceLeftTo, reduceRightTo, foldRight ...
+}
+            </code></pre>
+          </section>
+
+          <section>
+            <h2>Fetching Sketches from Pinot</h2>
+            <pre style="font-size: 0.35em"><code class="language-sql" data-trim>
+SELECT distinctCountRawThetaSketch(
+         views_theta, 'nominalEntries=65536'
+       ) AS sketch
+FROM   UserCohortsV1
+WHERE  workspace_id IN ('some-workspace-id')
+  AND ((
+        aggregation_name = 'segment'
+          AND event_time_day >= 1739318400000
+          AND event_time_day < 1739750400000
+          AND value = '2712828' -- Moderately Engaged Users
+       )
+    OR (
+        aggregation_name = 'segment'
+          AND event_time_day >= 1739318400000
+          AND event_time_day < 1739750400000
+          AND value = '3145' -- Interest - Natural Sciences
+       ))
+            </code></pre>
+            <p class="fragment" style="font-size: 0.7em">
+              &hellip;and similar queries for country and platform sketches from
+              other tables
+            </p>
+          </section>
+
+          <section>
+            <h2>One Query, One Sketch</h2>
+            <p>
+              Pinot returns a <strong>single pre-aggregated sketch</strong> per
+              query
+            </p>
+            <p class="fragment" style="font-size: 0.8em">
+              The old system would have returned many individual sketches that
+              we&rsquo;d have to merge client-side
+            </p>
+          </section>
+
+          <section>
+            <h2>Final Evaluation</h2>
+            <p style="font-size: 0.8em">
+              We now have three sketches &mdash; one per dimension
+            </p>
+            <pre><code class="language-scala" data-trim>
+intersect(
+  value(countrySketch),
+  value(platformSketch),
+  value(cohortSketch)
+)
+            </code></pre>
+            <p class="fragment" style="font-size: 0.8em">
+              One intersection, computed in memory &mdash; and we have our
+              answer
+            </p>
+          </section>
+
+          <section>
+            <h2>Evaluating Expressions</h2>
+            <p style="font-size: 0.75em">
+              Now <code>A</code> is a Pinot identifier &mdash; and we evaluate
+              over sketches
+            </p>
+            <pre style="font-size: 0.4em"><code class="language-scala" data-trim data-noescape>
+def executeSetExpression(
+    sketchMap: Map[PinotIdentifier, Sketch],
+    queryAccuracy: SketchLgSize,
+    expression: SetExpression[PinotIdentifier],
+    cf: ConsolidationFunction
+): ThetaBasedSketch = {
+  def loop(executable: SetExpression[PinotIdentifier]): ThetaBasedSketch =
+    executable match {
+      case Value(id) => sketchMap.getOrElse(id, emptySketch)
+
+      case Union(operands) =>
+        operands.map(loop) match {
+          case NonEmptyList(head, Nil) => head
+          case nel                     => union(queryAccuracy, cf)(nel)
+        }
+
+      case Intersect(operands) =>
+        operands.map(loop) match {
+          case NonEmptyList(head, Nil) => head
+          case nel                     => intersect(queryAccuracy, cf)(nel)
+        }
+    }
+
+  loop(expression)
+}
+          </code></pre>
+          </section>
+
+          <section>
+            <h2>Union &amp; Intersect</h2>
+            <pre
+              style="font-size: 0.45em"
+            ><code class="language-scala" data-trim data-noescape>
+def union(queryAccuracy: SketchLgSize, cf: ConsolidationFunction)(
+    nel: NonEmptyList[ThetaBasedSketch]
+): ThetaBasedSketch = nel
+  .foldLeft(SketchUnion.union(queryAccuracy, cf))((op, sketch) => op.apply(sketch))
+  .resultFast
+
+def intersect(queryAccuracy: SketchLgSize, cf: ConsolidationFunction)(
+    nel: NonEmptyList[ThetaBasedSketch]
+): ThetaBasedSketch = nel
+  .foldLeft(SketchIntersection.intersect(queryAccuracy, cf))((op, sketch) => op.apply(sketch))
+  .resultFast
+            </code></pre>
+            <p class="fragment" style="font-size: 0.75em">
+              Just a <code>foldLeft</code> over the real DataSketches operations
+            </p>
+            <p class="fragment" style="font-size: 0.75em">
+              Oh and let's not worry too much about what that consolidation
+              function is just yet lol
+            </p>
+          </section>
+        </section>
+
+        <!-- ============================================ -->
+        <!-- SECTION 9: TUPLE SKETCHES                    -->
+        <!-- ============================================ -->
+
+        <section>
+          <h2>Beyond Counting</h2>
+          <p>Theta sketches answer &ldquo;how many unique users?&rdquo;</p>
+          <p class="fragment">
+            But what about &ldquo;what is the
+            <strong>average time spent</strong> per user?&rdquo;
+          </p>
+        </section>
+
+        <section>
+          <h2>Tuple Sketches</h2>
+          <p style="font-size: 0.8em">
+            Each hash can carry an associated value (e.g. total engaged seconds)
+          </p>
+          <table style="font-size: 0.75em">
+            <thead>
+              <tr>
+                <th></th>
+                <th>Exact</th>
+                <th>Approximate</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Membership</td>
+                <td><code>Set[A]</code></td>
+                <td><code>ThetaSketch</code></td>
+              </tr>
+              <tr class="fragment">
+                <td>Membership + Value</td>
+                <td><code>Map[A, Int]</code></td>
+                <td><code>TupleSketch</code></td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section>
+          <h2>Consolidation Functions</h2>
+          <p style="font-size: 0.8em">
+            When combining tuple sketches, how do we merge values for the same
+            key?
+          </p>
+          <pre><code class="language-scala" data-trim>
+enum ConsolidationFunction:
+  case Sum   // total time spent
+  case Max   // longest session
+  case Min   // shortest session
+          </code></pre>
+          <p class="fragment" style="font-size: 0.75em">
+            Same set operations (union, intersection) &mdash; but values get
+            combined using the consolidation function
+          </p>
+          <p class="fragment" style="font-size: 0.75em">
+            It's giving <code>Monoid</code>
+          </p>
+        </section>
+
+        <section>
+          <h2>What This Enables</h2>
+          <ul>
+            <li>Mean time spent per user in an audience</li>
+            <li>Average page views per user</li>
+            <li>Video completion rates</li>
+            <li>&hellip;all with the same set expression evaluation engine</li>
+          </ul>
+          <p class="fragment" style="font-size: 0.75em">
+            Another exercise for the reader: create an <code>ApproxMap</code> in
+            the same spirit as <code>ApproxSet</code>
+          </p>
+        </section>
+
+        <section>
+          <div class="two-col">
+            <div>
+              <p style="font-size: 0.8em">
+                And here we are at the end of our journey. Please enjoy this
+                final holiday picture which was taken at the end of my journey
+                through some ruins before I wrap up
+              </p>
+            </div>
+            <div>
+              <img
+                src="img/jjj/cat-with-low-sun.jpg"
+                alt="Sunset cat"
+                style="max-height: 500px; object-fit: contain"
+              />
+            </div>
+          </div>
+        </section>
+
+        <!-- ============================================ -->
+        <!-- SECTION 10: WRAP-UP                          -->
+        <!-- ============================================ -->
+
+        <section>
+          <h2>Key Takeaways</h2>
+          <ul>
+            <li>
+              Don't be afraid to challenge assumptions about legacy systems
+            </li>
+            <li class="fragment">
+              Theta sketches solve count-distinct approximately and support
+              standard set operations
+              <ul>
+                <li class="fragment">
+                  Other types of sketch support different operations and
+                  features
+                </li>
+                <li class="fragment">
+                  e.g. tuple sketches behave like approximate maps
+                </li>
+                <li class="fragment">
+                  e.g. HLL Sketches are smaller than theta sketches but do not
+                  support intersections natively
+                </li>
+              </ul>
+            </li>
+            <li class="fragment">
+              Sometimes approximations can be good enough
+            </li>
+            <li class="fragment">
+              Leveraging OSS can be extremely useful, Pinot and DataSketches did
+              a lot of the hard work for us
+            </li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>Key Takeaways</h2>
+          <ul>
+            <li>
+              &ldquo;Type Driven Development&rdquo; can be really very helpful
+              in understanding customer problems
+            </li>
+            <li class="fragment">
+              Creating toy versions of things can help build intuition, it took
+              me a few iterations to get
+              <code>ApproxSet</code> right, but now I understand real sketches
+              slightly better probably
+            </li>
+            <li class="fragment">
+              None of these points are massively ground breaking or original
+            </li>
+            <li class="fragment">
+              But I still believe them to be important and true
+            </li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>Thank You</h2>
+          <p>Questions?</p>
+        </section>
+
+        <section>
+          <h2>References</h2>
+          <ul style="font-size: 0.7em">
+            <li>
+              <a href="https://www.youtube.com/watch?v=WLCwMRJBhuI">
+                Counting Tanks with Statistics (YouTube)
+              </a>
+              — estimating population size from a sample
+            </li>
+            <li>
+              <a
+                href="https://datasketches.apache.org/docs/Theta/ThetaSketches.html"
+              >
+                Apache DataSketches — Theta Sketches
+              </a>
+            </li>
+            <li>
+              <a href="https://github.com/apache/pinot"> Apache Pinot </a>
+            </li>
+            <li>
+              <a
+                href="https://github.com/apache/datasketches-website/blob/master/docs/pdf/ThetaSketchEquations.pdf"
+              >
+                Theta Sketch Mathematical Framework (PDF)
+              </a>
+            </li>
+          </ul>
+        </section>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/highlight.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/math/math.js"></script>
+    <script>
+      Reveal.initialize({
+        hash: true,
+        slideNumber: true,
+        plugins: [RevealHighlight, RevealMath.KaTeX],
+        highlight: {
+          highlightOnLoad: true,
+        },
+      });
+    </script>
+  </body>
+</html>

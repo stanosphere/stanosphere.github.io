@@ -1,0 +1,3011 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Brute Force, Binomials and Balatro</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reset.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/black.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/monokai.css"
+    />
+    <style>
+      :root {
+        --r-heading-font: "Source Sans Pro", Helvetica, sans-serif;
+        --r-main-font: "Source Sans Pro", Helvetica, sans-serif;
+      }
+      .reveal h1,
+      .reveal h2,
+      .reveal h3 {
+        text-transform: none;
+      }
+
+      /* ---- code ---- */
+      .reveal pre {
+        width: max-content;
+        max-width: 100%;
+        margin: 16px auto;
+        font-size: 0.58em;
+        line-height: 1.15;
+      }
+      .reveal pre code {
+        max-height: 600px;
+        padding: 14px 18px;
+      }
+      .reveal .small-code pre {
+        font-size: 0.6em;
+        line-height: 1.1;
+      }
+      .reveal .small-code h2 {
+        font-size: 1.3em;
+        margin-bottom: 0.25em;
+      }
+
+      .reveal :not(pre) > code.hljs {
+        white-space: nowrap;
+        display: inline;
+        padding: 0.1em 0.35em;
+        border-radius: 4px;
+        font-size: 0.95em;
+      }
+
+      /* ---- images ---- */
+      .reveal img {
+        border: none;
+        box-shadow: none;
+        background: none;
+      }
+      .reveal .img-white-bg img {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+      }
+      .reveal .full-width {
+        display: flex;
+        justify-content: center;
+      }
+      .reveal .full-width img {
+        max-width: 100%;
+        max-height: 480px;
+        width: auto;
+        height: auto;
+      }
+      .reveal section.no-title .full-width img {
+        max-height: 600px;
+      }
+
+      /* big picture on the left, short caption in a narrow column on the right */
+      .reveal .figure-row {
+        display: flex;
+        gap: 32px;
+        align-items: center;
+      }
+      .reveal .figure-row .figure {
+        flex: 0 1 auto;
+        min-width: 0;
+        display: flex;
+        justify-content: center;
+      }
+      .reveal .figure-row .figure img {
+        max-width: 100%;
+        max-height: 540px;
+        width: auto;
+        height: auto;
+      }
+      .reveal section.no-title .figure-row .figure img {
+        max-height: 600px;
+      }
+      .reveal .figure-row .caption {
+        flex: 1 1 260px;
+        min-width: 220px;
+        text-align: left;
+        font-size: 0.75em;
+        color: #bbb;
+      }
+      .reveal .figure-row .caption p {
+        margin: 0 0 0.6em 0;
+      }
+      .reveal .swatch {
+        display: inline-block;
+        width: 0.8em;
+        height: 0.8em;
+        border-radius: 3px;
+        vertical-align: -0.1em;
+        margin-right: 0.3em;
+      }
+      /* joker sprites are tiny pixel art: scale them up crisply */
+      .reveal img[src^="img/jokers/"] {
+        height: 260px;
+        width: auto;
+        image-rendering: pixelated;
+      }
+      .reveal .joker-name {
+        font-weight: 600;
+        font-size: 0.7em;
+        margin: 0 0 0.3em 0;
+      }
+      .reveal .joker-effect {
+        font-size: 0.5em;
+        color: #bbb;
+        margin: 0.4em 0 0 0;
+      }
+      /* a row above a picture, exactly as wide as the picture */
+      .reveal .fit-image {
+        display: flex;
+        flex-direction: column;
+        width: fit-content;
+        margin: 0 auto;
+        gap: 16px;
+      }
+      .reveal .fit-image > .two-col {
+        width: 0;
+        min-width: 100%;
+      }
+      .reveal .struck {
+        text-decoration: line-through;
+        text-decoration-color: #e0245e;
+        text-decoration-thickness: 0.12em;
+        color: #888;
+      }
+      .reveal table.orderings {
+        font-size: 0.9em;
+        margin: 0;
+      }
+      .reveal table.orderings th,
+      .reveal table.orderings td {
+        text-align: center;
+        padding: 0.12em 0.55em;
+        border: none;
+      }
+      .reveal .stack-text p {
+        margin: 0 0 0.45em 0;
+        text-align: left;
+      }
+      .reveal .straight-grid {
+        display: grid;
+        grid-template-columns: max-content max-content;
+        gap: 14px 48px;
+        justify-content: center;
+        justify-items: start;
+        align-items: center;
+      }
+      .reveal .straight-grid .pic {
+        line-height: 0;
+      }
+      .reveal .straight-grid .pic img {
+        height: 76px;
+        margin: 0;
+        padding: 8px 12px;
+      }
+      .reveal .straight-grid.big .pic img {
+        height: 100px;
+        max-width: none;
+      }
+      .reveal .straight-grid .mark {
+        font-size: 1.6em;
+        font-weight: 700;
+      }
+      .reveal .straight-grid .mark.ok {
+        color: #3cb371;
+      }
+      .reveal .straight-grid .mark.no {
+        color: #dc143c;
+      }
+      .reveal .class-grid {
+        display: grid;
+        grid-template-columns: max-content max-content max-content;
+        gap: 2px 28px;
+        justify-items: start;
+        align-items: center;
+      }
+      .reveal .class-grid .pic img {
+        margin: 0;
+      }
+      .reveal .class-grid .multiset {
+        font-size: 0.85em;
+      }
+      .reveal .class-grid .name {
+        font-size: 0.7em;
+        color: #bbb;
+      }
+      .reveal .hl-word {
+        color: #f4c430;
+        font-weight: 700;
+      }
+      .reveal .column-title {
+        font-size: 1.1em;
+        font-weight: 600;
+        color: #fff;
+        text-align: left;
+        margin: 0 0 0.6em 0;
+      }
+      /* hand pictures paired with their multisets, a table without being a table */
+      .reveal .pairing {
+        display: grid;
+        grid-template-columns: max-content max-content;
+        gap: 24px 48px;
+        align-items: center;
+        justify-content: center;
+      }
+      .reveal .pairing-row {
+        display: contents;
+      }
+      .reveal .pairing-row .picture {
+        flex: 0 0 auto;
+      }
+      .reveal .pairing-row .maths {
+        flex: 1 1 auto;
+        text-align: left;
+        font-size: 1.3em;
+      }
+      .reveal .pairing-row .maths .words {
+        display: block;
+        font-size: 0.5em;
+        color: #bbb;
+        margin-top: 0.2em;
+      }
+      .reveal .key-row {
+        display: flex;
+        gap: 24px;
+        align-items: center;
+      }
+      .reveal .key-row .picture {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        justify-content: center;
+      }
+      .reveal .key-row .picture img {
+        max-width: 100%;
+        max-height: 660px;
+        width: auto;
+        height: auto;
+      }
+      .reveal .key {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5em;
+        font-size: 0.6em;
+        text-align: left;
+        white-space: nowrap;
+      }
+      .reveal .key .key-intro {
+        white-space: normal;
+        max-width: 200px;
+        color: #bbb;
+        margin: 0 0 0.8em 0;
+      }
+      .reveal .definitions {
+        display: flex;
+        flex-direction: column;
+        gap: 1em;
+        align-items: center;
+        font-size: 1.3em;
+      }
+      .reveal .definitions > div {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.2em;
+        width: 100%;
+        max-width: 1100px;
+        align-items: baseline;
+      }
+      .reveal .definitions .maths {
+        text-align: right;
+      }
+      .reveal .definitions .words {
+        text-align: left;
+        font-size: 0.6em;
+        color: #bbb;
+      }
+
+      /* ---- layout ---- */
+      .reveal .two-col {
+        display: flex;
+        gap: 40px;
+        align-items: center;
+      }
+      .reveal .two-col > * {
+        flex: 1;
+      }
+      .reveal .subtitle {
+        font-size: 0.7em;
+        color: #888;
+        margin-top: 0.5em;
+      }
+      .reveal .highlight-box {
+        background: rgba(66, 133, 244, 0.15);
+        border-left: 4px solid #4285f4;
+        padding: 16px 24px;
+        border-radius: 4px;
+        text-align: left;
+        font-size: 0.8em;
+      }
+      .reveal ul {
+        font-size: 0.85em;
+      }
+
+      /* ---- tables (new for this talk: lots of results tables) ---- */
+      .reveal table {
+        font-size: 0.6em;
+        margin: 0 auto;
+      }
+      /* the highlight plugin builds a table for line numbers; it must not inherit the results-table size */
+      .reveal pre code table {
+        font-size: inherit;
+      }
+      .reveal table th,
+      .reveal table td {
+        padding: 0.3em 0.8em;
+      }
+      .reveal table td.num,
+      .reveal table th.num {
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+      }
+      .reveal .small-table table {
+        font-size: 0.5em;
+      }
+      .reveal table tr.hl {
+        background: rgba(66, 133, 244, 0.2);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="reveal">
+      <div class="slides">
+        <!-- ============================================ -->
+        <!-- TITLE                                        -->
+        <!-- ============================================ -->
+
+        <section>
+          <h1>Brute Force, Binomials and Balatro</h1>
+          <p style="font-size: 0.6em; margin-top: 2em">
+            Paul Stanford · Permutive · London Scala User Group
+          </p>
+        </section>
+
+        <!-- ============================================ -->
+        <!-- ============================================ -->
+
+        <!-- ============================================ -->
+        <!-- SECTION 1: WHAT IS BALATRO?                  -->
+        <!-- ============================================ -->
+
+        <section>
+          <h2>What is Balatro?</h2>
+          <img
+            src="img/screenshots/seed_94IKWPES.png"
+            alt="A typical Balatro round"
+            height="470"
+          />
+          <p class="subtitle" style="margin-top: 0.3em">
+            seed 94IKWPES, if you want to play it yourself
+          </p>
+        </section>
+
+        <section>
+          <h2>Jokers</h2>
+          <div class="two-col" style="align-items: flex-start">
+            <div class="fragment">
+              <p class="joker-name">Joker</p>
+              <img src="img/jokers/joker.png" alt="Joker: +4 Mult" />
+              <p class="joker-effect">+4 Mult</p>
+            </div>
+            <div class="fragment">
+              <p class="joker-name">Greedy Joker</p>
+              <img
+                src="img/jokers/greedy-joker.png"
+                alt="Greedy Joker: Played cards with Diamond suit give +3 Mult when scored"
+              />
+              <p class="joker-effect">
+                Played cards with Diamond suit give +3 Mult when scored
+              </p>
+            </div>
+            <div class="fragment">
+              <p class="joker-name">Crazy Joker</p>
+              <img
+                src="img/jokers/crazy-joker.png"
+                alt="Crazy Joker: +12 Mult if played hand contains a Straight"
+              />
+              <p class="joker-effect">
+                +12 Mult if played hand contains a Straight
+              </p>
+            </div>
+            <div class="fragment">
+              <p class="joker-name">Runner</p>
+              <img
+                src="img/jokers/runner.png"
+                alt="Runner: Gains +15 Chips if played hand contains a Straight"
+              />
+              <p class="joker-effect">
+                Gains +15 Chips if played hand contains a Straight
+              </p>
+            </div>
+          </div>
+          <p class="fragment subtitle" style="margin-top: 0.8em">
+            All of these jokers just help increase the score
+          </p>
+        </section>
+
+        <section>
+          <h2>Shortcut Joker</h2>
+          <div class="fit-image">
+            <div class="two-col" style="gap: 48px">
+              <div style="flex: 0 0 auto">
+                <img
+                  src="img/jokers/shortcut.png"
+                  alt="The Shortcut Joker"
+                  style="height: 236px"
+                />
+              </div>
+              <div>
+                <div class="highlight-box">
+                  Allows Straights to be made with
+                  <strong>gaps of 1 rank</strong>
+                  <span style="white-space: nowrap">(ex: 10 8 6 5 3)</span>
+                </div>
+              </div>
+            </div>
+            <div class="full-width fragment">
+              <img
+                src="img/doodle/cards/shortcut-10-8-6-5-3.png"
+                alt="3 5 6 8 10 laid out by rank, with empty slots where the 4, 7 and 9 would be"
+              />
+            </div>
+          </div>
+          <p class="fragment subtitle">
+            This Joker fundamentally changes the rules!
+          </p>
+        </section>
+
+        <section>
+          <h2>The Question</h2>
+          <p>
+            Playing with the Shortcut Joker I felt like I was getting loads of
+            straights easily! But can this be quantified?
+          </p>
+          <div class="highlight-box">
+            Given a standard 52 card deck what is the probability that the first
+            8 cards I draw contain a straight where gaps of one are allowed?
+          </div>
+          <p class="fragment" style="margin: 1em 0 0.3em 0">
+            But first, a simpler question
+          </p>
+          <div class="highlight-box fragment">
+            Given a standard 52 card deck what is the probability that the first
+            8 cards I draw contain a
+            <span class="hl-word">normal</span> straight?
+          </div>
+
+        </section>
+
+        <section class="no-title">
+          <div
+            class="two-col"
+            style="align-items: center; gap: 48px; justify-content: center"
+          >
+            <div style="flex: 0 0 240px">
+              <h2 style="text-align: left; font-size: 1.6em; margin: 0">
+                What is a Straight?
+              </h2>
+            </div>
+            <div class="straight-grid big" style="flex: 0 0 auto">
+              <div class="pic img-white-bg">
+                <img
+                  src="img/doodle/straights/straight-middle.png"
+                  alt="5 6 7 8 9 in mixed suits"
+                />
+              </div>
+              <div class="mark ok">✓</div>
+              <div class="pic img-white-bg">
+                <img
+                  src="img/doodle/straights/straight-ace-low.png"
+                  alt="A 2 3 4 5 in mixed suits"
+                />
+              </div>
+              <div class="mark ok">✓</div>
+              <div class="pic img-white-bg">
+                <img
+                  src="img/doodle/straights/straight-ace-high.png"
+                  alt="10 J Q K A in mixed suits"
+                />
+              </div>
+              <div class="mark ok">✓</div>
+              <div class="pic img-white-bg fragment" data-fragment-index="0">
+                <img
+                  src="img/doodle/straights/not-a-straight-wrap-plain.png"
+                  alt="Q K A 2 3: not a straight"
+                />
+              </div>
+              <div class="mark no fragment" data-fragment-index="0">✗</div>
+              <div class="pic img-white-bg fragment" data-fragment-index="1">
+                <img
+                  src="img/doodle/straights/eight-cards-with-straight.png"
+                  alt="An 8-card hand 3 5 6 7 8 9 J K, which contains the straight 5 to 9"
+                />
+              </div>
+              <div class="mark ok fragment" data-fragment-index="1">✓</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============================================ -->
+        <!-- SECTION 2: BRUTE FORCE, IN ONE SLIDE         -->
+        <!-- ============================================ -->
+
+        <section class="small-code">
+          <h2>Brute Force</h2>
+          <pre
+            style="font-size: 0.54em"
+          ><code class="language-scala" data-trim><script type="text/template">
+enum Rank:
+  case Ace, Two, Three, Four, Five, Six, Seven,
+    Eight, Nine, Ten, Jack, Queen, King
+enum Suit:
+  case Spade, Heart, Club, Diamond
+case class Card(rank: Rank, suit: Suit)
+
+val fullDeck: List[Card] =
+  for
+    rank <- Rank.values.toList
+    suit <- Suit.values.toList
+  yield Card(rank, suit)
+
+def containsStraight(hand: List[Card]): Boolean = ???
+
+fullDeck.combinations(8).count(containsStraight)
+</script></code></pre>
+          <p class="fragment" style="font-size: 0.8em; margin: 0.3em 0 0.1em 0">
+            You just do it, and it works: 73,870,336 of 752,538,150 hands, 9.82%
+          </p>
+          <ol
+            class="fragment"
+            style="
+              font-size: 0.75em;
+              text-align: left;
+              display: inline-block;
+              margin: 0;
+            "
+          >
+            <li>
+              But it tells me nothing about the problem. I still don't know
+              <em>why</em> it's 9.82%
+            </li>
+            <li>And it took 3 min 38 s</li>
+          </ol>
+        </section>
+
+        <section>
+          <h1>
+            <span class="struck">Brute Force,</span> Binomials and Balatro
+          </h1>
+          <p style="font-size: 0.6em; margin-top: 2em">
+            Paul Stanford · Permutive · London Scala User Group
+          </p>
+        </section>
+
+        <!-- ============================================ -->
+        <!-- SECTION 3: MATHEMATICAL SOLUTION             -->
+        <!-- ============================================ -->
+
+        <section class="no-title">
+          <div class="two-col" style="justify-content: center; gap: 90px">
+            <div style="flex: 0 0 auto">
+              <img
+                src="img/silly/de-moivre.jpg"
+                alt="A portrait of an eighteenth-century mathematician"
+                style="height: 500px; width: auto; border-radius: 6px"
+              />
+            </div>
+            <div style="flex: 0 0 auto">
+              <h1
+                style="
+                  font-size: 2.5em;
+                  line-height: 1.05;
+                  text-align: left;
+                  margin: 0;
+                "
+              >
+                Mathematical<br />Solution
+              </h1>
+              <ol style="font-size: 0.7em; margin-top: 0.8em">
+                <li>Simplest case: a hand of 5 cards</li>
+                <li>More simple cases, to build intuition</li>
+                <li>The general case</li>
+                <li>The general case, in Scala</li>
+                <li>Introduce gaps</li>
+              </ol>
+            </div>
+          </div>
+        </section>
+
+        <section class="no-title">
+          <div class="figure-row">
+            <div class="caption">
+              <p class="column-title">5 cards</p>
+              <p>
+                First we can work out how many straights exist if we ignore
+                suits
+              </p>
+              <p>
+                To do this we need only consider the
+                <span class="hl-word">rank sets</span> of a hand
+              </p>
+              <p>
+                I define a "rank set" as the set of distinct ranks in a hand
+              </p>
+            </div>
+            <div class="figure img-white-bg">
+              <img
+                src="img/doodle/straights/ten-straights-rank-only.png"
+                alt="The ten straights, A-2-3-4-5 up to 10-J-Q-K-A, as rank sets: ranks only, no suits"
+              />
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <section class="no-title">
+            <div class="figure-row">
+              <div class="caption">
+                <p class="column-title">5 cards</p>
+                <p>
+                  For each card we have 4 choices of suit, and there are 5 cards
+                </p>
+                <p>\(4^5 = 1{,}024\)</p>
+                <p>
+                  This is just a handful of examples with the first rank set, A
+                  to 5. Well, a few handfuls I guess!
+                </p>
+              </div>
+              <div class="figure img-white-bg">
+                <img
+                  src="img/doodle/cards/ten-suitings-a-to-5.png"
+                  alt="Ten ways to suit A-2-3-4-5, from all spades to all four suits"
+                />
+              </div>
+            </div>
+          </section>
+
+          <section class="no-title">
+            <div class="key-row">
+              <div class="key">
+                <p class="column-title">5 cards</p>
+                <p class="key-intro">
+                  All 1,024 ways to choose suits for one rank set
+                </p>
+                <div>
+                  <span class="swatch" style="background: #f4c430"></span>♠
+                  saffron
+                </div>
+                <div>
+                  <span class="swatch" style="background: #ff4f5e"></span>♥ hot
+                  coral
+                </div>
+                <div>
+                  <span class="swatch" style="background: #007ba7"></span>♣
+                  cerulean
+                </div>
+                <div>
+                  <span class="swatch" style="background: #5b2a86"></span>♦ deep
+                  purple
+                </div>
+              </div>
+              <div class="picture">
+                <img
+                  src="img/doodle/cards/all-suitings-a-to-5.png"
+                  alt="All 1,024 suit assignments of A-2-3-4-5 as a grid of coloured cells"
+                />
+              </div>
+            </div>
+          </section>
+        </section>
+
+        <section class="no-title">
+          <p
+            class="column-title"
+            style="max-width: 1100px; margin: 0 auto 0.6em auto"
+          >
+            5 cards
+          </p>
+          <div class="definitions">
+            <div>
+              <span class="maths">\(S = 10\)</span>
+              <span class="words"
+                >the number of rank sets that give a straight</span
+              >
+            </div>
+            <div>
+              <span class="maths">\(Su = 4^5 = 1{,}024\)</span>
+              <span class="words"
+                >the <span class="hl-word">suit factor</span>: the number of
+                ways to choose suits for a given rank set</span
+              >
+            </div>
+            <div>
+              <span class="maths">\(S \times Su = 10{,}240\)</span>
+              <span class="words"></span>
+            </div>
+          </div>
+        </section>
+
+
+        <section>
+          <h2>Six-Card Hands</h2>
+          <p style="font-size: 0.9em; margin: 0 0 0.4em 0">
+            How many hands of 6 cards contain a straight?
+          </p>
+          <div class="full-width img-white-bg">
+            <img
+              src="img/doodle/cards/naive-count.png"
+              alt="A 3-to-7 straight of diamonds plus an empty slot for the sixth card"
+              style="width: 100%; max-width: 1100px"
+            />
+          </div>
+          <div style="font-size: 0.9em; margin-top: 0.6em">
+            <p class="fragment">
+              10,240 5-card straights multiplied by 47 choices of sixth card =
+              481,280
+            </p>
+            <p class="fragment">
+              But brute force says 367,616. So what did I do wrong?
+            </p>
+          </div>
+        </section>
+
+        <section>
+          <h2>Double Counting Demons</h2>
+          <div class="figure-row">
+            <div class="figure img-white-bg">
+              <img
+                src="img/doodle/cards/double-count-extension.png"
+                alt="The same six-card hand built two ways: 3-7 of diamonds plus the 2, or 2 to 6 plus the 7"
+              />
+            </div>
+            <div class="caption">
+              <p class="fragment">
+                If I have a run of 6 cards there's always going to be 2 ways to
+                get to it!
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2>Devious Double Counting Demons</h2>
+          <div class="figure-row">
+            <div class="figure img-white-bg">
+              <img
+                src="img/doodle/cards/double-count-pair.png"
+                alt="The same six-card hand built two ways: 3-7 of diamonds plus the 3 of clubs, or 3 of clubs to 7 plus the 3 of diamonds"
+              />
+            </div>
+            <div class="caption">
+              <p class="fragment">
+                More subtly if I have a hand with a straight and a duplicate
+                rank there's also going to be two ways to get to it!
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2>Two Classes of Demon</h2>
+          <p class="subtitle" style="margin-top: 0">
+            There are two different types of double counting which correspond to
+            different "templates" for the hand; the difference is the number of
+            <span class="hl-word">distinct ranks</span> in each hand
+          </p>
+          <p
+            class="fragment"
+            data-fragment-index="0"
+            style="font-size: 0.8em; margin: 0.1em 0 0.3em 0"
+          >
+            Each template can be thought of as a
+            <span class="hl-word">multiset</span>
+          </p>
+          <div
+            class="two-col"
+            style="align-items: flex-start; justify-content: center; gap: 70px"
+          >
+            <div style="flex: 0 1 auto">
+              <div class="img-white-bg" style="line-height: 0">
+                <img
+                  src="img/doodle/shapes/six-distinct-examples.png"
+                  alt="Three six-card hands with six distinct ranks: 3 to 7 of diamonds plus a 9, 3 to 8, and 9 to King plus a 4"
+                  style="max-height: 240px; margin: 0; padding: 10px 14px"
+                />
+              </div>
+              <p style="font-size: 0.8em; margin: 0.4em 0 0 0">
+                six distinct ranks
+              </p>
+              <p
+                class="fragment"
+                data-fragment-index="1"
+                style="font-size: 0.8em; margin: 0.2em 0 0 0"
+              >
+                \(\{1, 1, 1, 1, 1, 1\}\)
+              </p>
+            </div>
+            <div style="flex: 0 1 auto">
+              <div class="img-white-bg" style="line-height: 0">
+                <img
+                  src="img/doodle/shapes/six-pair-examples.png"
+                  alt="Three six-card hands with one pair: 3 to 7 of diamonds plus a second 3, plus a second 6, and 9 to King plus a second Queen"
+                  style="max-height: 240px; margin: 0; padding: 10px 14px"
+                />
+              </div>
+              <p style="font-size: 0.8em; margin: 0.4em 0 0 0">
+                five distinct ranks, one pair
+              </p>
+              <p
+                class="fragment"
+                data-fragment-index="1"
+                style="font-size: 0.8em; margin: 0.2em 0 0 0"
+              >
+                \(\{2, 1, 1, 1, 1\}\)
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2>Multisets</h2>
+          <div class="figure-row">
+            <div class="caption" style="flex: 1 1 600px; font-size: 0.6em">
+              <p>
+                A set is an unordered collection of objects where each object
+                can appear at most once
+              </p>
+              <p class="fragment">
+                A <span class="hl-word">multiset</span> is like a set but each
+                element can appear multiple times; each element has a
+                <span class="hl-word">multiplicity</span>. In Scala terms it is
+                a bit like a <code class="language-scala">Map[A, Int]</code>,
+                from each element to its multiplicity
+              </p>
+              <p class="fragment">
+                We can denote a multiset more compactly by using exponents to
+                count how many times each element appears: \(\{2, 1, 1, 1, 1\} =
+                \{2, 1^4\}\) and \(\{1, 1, 1, 1, 1, 1\} = \{1^6\}\)
+              </p>
+              <p class="fragment">
+                Each multiset corresponds to a template for our hand; there are
+                many possible ways to fill in this template by choosing
+                different suits and choosing which ranks get paired up (or later
+                tripled up)
+              </p>
+              <p class="fragment">
+                I call these templates
+                <span class="hl-word">degeneracy classes</span> because
+                different templates have different repeated (or degenerate)
+                ranks
+              </p>
+            </div>
+            <div class="figure img-white-bg">
+              <img
+                src="img/doodle/shapes/six-pair-examples.png"
+                alt="Three different hands, all of shape {2, 1^4}"
+                style="max-height: 380px"
+              />
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2>One Pair: Rank Sets</h2>
+          <div class="figure-row">
+            <div class="caption">
+              <p class="column-title">\(\{2, 1^4\}\)</p>
+              <p>
+                We only care about the number of rank sets that contain a
+                straight. As with the 5 card case we only have 5 distinct ranks
+                here so we have \(S = 10\).
+              </p>
+              <p class="fragment">
+                Write it \(S(r)\), with \(r\) the number of distinct ranks:
+                \(S(5) = 10\)
+              </p>
+            </div>
+            <div class="figure img-white-bg">
+              <img
+                src="img/doodle/cards/pair-hand-rank-set.png"
+                alt="The pair hand, then its rank set: forget suits, forget the repeat"
+              />
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2>One Pair: Placements</h2>
+          <div class="figure-row">
+            <div class="caption">
+              <p class="column-title">\(\{2, 1^4\}\)</p>
+              <p>
+                A <span class="hl-word">placement</span> says which rank plays
+                which role (i.e. which rank gets to be a pair, which gets to be
+                a triple, etc). We can let \(P(d)\) denote the total placements
+                for a degeneracy class \(d\).
+              </p>
+              <p class="fragment">
+                Which rank gets the pair? 5 choices: \(P = 5\)
+              </p>
+              <p class="fragment">
+                Or: the distinct orderings of \(\{2, 1, 1, 1, 1\}\) along the
+                five ranks. 2 1 1 1 1, 1 2 1 1 1, … five of them
+              </p>
+              <p style="font-size: 0.85em; color: #bbb">
+                <span class="swatch" style="background: #ffd6da"></span> the
+                pair
+              </p>
+            </div>
+            <div class="figure img-white-bg">
+              <img
+                src="img/doodle/cards/pair-placements-tinted.png"
+                alt="The 3 to 7 straight of diamonds with the pair on the 3, then the 4, 5, 6 and 7"
+                style="max-height: 470px"
+              />
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2>One Pair: Suits</h2>
+          <div class="full-width img-white-bg">
+            <img
+              src="img/doodle/cards/pair-suitings.png"
+              alt="The six ways to suit a pair of 3s: spade-heart, spade-club, spade-diamond, heart-club, heart-diamond, club-diamond"
+              style="max-height: 160px"
+            />
+          </div>
+          <div style="font-size: 0.72em; margin-top: 0.4em">
+            <p>Which 2 of the 4 suits does the pair get? 6 ways</p>
+            <p class="fragment">
+              Written \(\binom{4}{2}\),
+              <span class="hl-word">"4 choose 2"</span>: the number of ways to
+              choose 2 things from 4
+            </p>
+            <p class="fragment">
+              Each single picks 1 suit of 4: \(\binom{4}{1} = 4\) ways
+            </p>
+            <p class="fragment">
+              \(Su = \binom{4}{2}\binom{4}{1}^4 = 6 \times 256 = 1{,}536\)
+            </p>
+            <p class="fragment">
+              \(S(5) \times P \times Su = 10 \times 5 \times 1{,}536 =
+              76{,}800\)
+            </p>
+          </div>
+        </section>
+
+        <section>
+          <h2>Binomial Coefficients</h2>
+          <div class="two-col" style="align-items: center; gap: 56px">
+            <div style="flex: 0 0 auto">
+              <div
+                style="
+                  background: white;
+                  border-radius: 8px;
+                  padding: 10px 18px;
+                "
+              >
+                <table class="orderings">
+                  <thead>
+                    <tr>
+                      <th style="color: #111">♠</th>
+                      <th style="color: #dc143c">♥</th>
+                      <th style="color: #111">♣</th>
+                      <th style="color: #dc143c">♦</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td style="color: #111">✓</td>
+                      <td style="color: #111">✓</td>
+                      <td style="color: #999">✗</td>
+                      <td style="color: #999">✗</td>
+                    </tr>
+                    <tr>
+                      <td style="color: #111">✓</td>
+                      <td style="color: #999">✗</td>
+                      <td style="color: #111">✓</td>
+                      <td style="color: #999">✗</td>
+                    </tr>
+                    <tr>
+                      <td style="color: #111">✓</td>
+                      <td style="color: #999">✗</td>
+                      <td style="color: #999">✗</td>
+                      <td style="color: #111">✓</td>
+                    </tr>
+                    <tr>
+                      <td style="color: #999">✗</td>
+                      <td style="color: #111">✓</td>
+                      <td style="color: #111">✓</td>
+                      <td style="color: #999">✗</td>
+                    </tr>
+                    <tr>
+                      <td style="color: #999">✗</td>
+                      <td style="color: #111">✓</td>
+                      <td style="color: #999">✗</td>
+                      <td style="color: #111">✓</td>
+                    </tr>
+                    <tr>
+                      <td style="color: #999">✗</td>
+                      <td style="color: #999">✗</td>
+                      <td style="color: #111">✓</td>
+                      <td style="color: #111">✓</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="stack-text" style="flex: 1 1 auto; font-size: 0.64em">
+              <p>
+                \(\binom{4}{2}\) is the number of distinct orderings of {✓, ✓,
+                ✗, ✗} along the four suits
+              </p>
+              <p class="fragment">
+                Four different things line up in \(4! = 4 \times 3 \times 2
+                \times 1 = 24\) ways
+              </p>
+              <p class="fragment">
+                Swapping the two ✓s, or the two ✗s, changes nothing: divide by
+                \(2!\) twice
+              </p>
+              <p class="fragment">
+                \(\binom{4}{2} = \dfrac{4!}{2!\,2!} = \dfrac{24}{4} = 6\)
+              </p>
+              <p class="fragment">
+                In general \(\binom{n}{k} = \dfrac{n!}{k!\,(n-k)!}\)
+              </p>
+              <p class="fragment">
+                \((x+y)^4 = x^4 + 4x^3y + 6x^2y^2 + 4xy^3 + y^4\): the 6 is the
+                orderings of \(x\,x\,y\,y\)
+              </p>
+              <p class="fragment">
+                And \(\binom{52}{8} = 752{,}538{,}150\): every 8-card hand.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <section>
+            <h2>Six Distinct Ranks</h2>
+            <div class="figure-row">
+              <div class="caption" style="flex: 1 1 420px">
+                <p class="column-title">\(\{1^6\}\), no duplicates</p>
+                <p>Either a run of six ranks: 9 of them</p>
+                <p class="fragment">
+                  Or a 5-card straight plus a rank that doesn't "touch" it: 62
+                </p>
+                <p class="fragment">\(S(6) = 9 + 62 = 71\)</p>
+                <p class="fragment">
+                  \(P = 1\), &nbsp; \(Su = \binom{4}{1}^6\)
+                </p>
+                <p class="fragment">\(71 \times 4{,}096 = 290{,}816\)</p>
+              </div>
+              <div class="figure img-white-bg">
+                <img
+                  src="img/doodle/cards/six-distinct-ranks.png"
+                  alt="Top: 3 to 8 of diamonds, a six-card straight. Bottom: 3 to 7 of diamonds plus a 9, laid out by rank with the 8 empty"
+                  style="max-height: 420px"
+                />
+              </div>
+            </div>
+          </section>
+
+          <section>
+            <h2>Where the 62 Comes From</h2>
+            <div class="full-width img-white-bg">
+              <img
+                src="img/doodle/cards/sixth-rank-cases.png"
+                alt="Top: 4 to 8 of diamonds on a full Ace-to-King rank line with the 3 and 9 crossed out. Bottom: Ace to 5 of diamonds with only the 6 crossed out"
+                style="max-height: 250px"
+              />
+            </div>
+            <div style="font-size: 0.7em; margin-top: 0.2em; line-height: 1.25">
+              <p>
+                A 5-card straight, plus a sixth rank that doesn't "touch" it
+              </p>
+              <p class="fragment">
+                8 straights sit in the middle: \(13 - 5 - 2 = 6\) free ranks
+                each
+              </p>
+              <p class="fragment">
+                2 straights end on an Ace: \(13 - 5 - 1 = 7\) free ranks each
+              </p>
+              <p class="fragment">\(8 \times 6 + 2 \times 7 = 62\)</p>
+            </div>
+          </section>
+
+          <section>
+            <h2>All 71 of Them</h2>
+            <div class="full-width img-white-bg">
+              <img
+                src="img/doodle/cards/all-71-rank-sets.png"
+                alt="All 71 six-rank rank sets containing a straight: the 9 six-card runs down the left, and the 62 five-card straights plus a sixth rank in ten rows, one per straight, the sixth rank tinted yellow"
+                style="max-height: 540px"
+              />
+            </div>
+          </section>
+        </section>
+
+        <section>
+          <h2>Six Cards, Counted</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>class</th>
+                <th>multiset</th>
+                <th class="num">\(r\)</th>
+                <th class="num">\(S(r)\)</th>
+                <th class="num">\(P(d)\)</th>
+                <th class="num">\(Su(d)\)</th>
+                <th class="num">product</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="fragment">
+                <td>no duplicates</td>
+                <td>\(\{1^6\}\)</td>
+                <td class="num">6</td>
+                <td class="num">71</td>
+                <td class="num">\(\binom{6}{6} = 1\)</td>
+                <td class="num">\(\binom{4}{1}^{6} = 4{,}096\)</td>
+                <td class="num">290,816</td>
+              </tr>
+              <tr class="fragment">
+                <td>one pair</td>
+                <td>\(\{2^{1}, 1^4\}\)</td>
+                <td class="num">5</td>
+                <td class="num">10</td>
+                <td class="num">\(\binom{5}{1} = 5\)</td>
+                <td class="num">\(\binom{4}{2}\binom{4}{1}^{4} = 1{,}536\)</td>
+                <td class="num">76,800</td>
+              </tr>
+              <tr class="fragment hl">
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td class="num">sum</td>
+                <td class="num">367,616</td>
+              </tr>
+            </tbody>
+          </table>
+          <p class="fragment" style="font-size: 0.85em; margin-top: 0.5em">
+            Every hand is now built exactly once, the degeneracy classes can't
+            ever overlap
+          </p>
+        </section>
+
+        <!-- ============================================ -->
+        <!-- THE GENERAL APPROACH                         -->
+        <!-- ============================================ -->
+
+        <section>
+          <h2>The Insight</h2>
+          <div class="figure-row">
+            <div class="figure img-white-bg">
+              <img
+                src="img/doodle/general/only-ranks-matter.png"
+                alt="An eight-card hand, then the same hand with suits removed, then its rank set with the repeated 3 collapsed"
+                style="max-height: 470px"
+              />
+            </div>
+            <div class="caption" style="flex: 1 1 440px">
+              <div class="highlight-box" style="font-size: 1em">
+                Whether or not a hand contains a straight depends only on the
+                <strong>set</strong> of ranks in that hand
+              </div>
+              <p class="fragment" style="margin-top: 0.8em">
+                Everything else, the suits and the placements, is just counting
+                how many different hands share that rank set
+              </p>
+              <p class="fragment">
+                That's why \(S(r)\) needs nothing but \(r\)
+              </p>
+              <p class="fragment">
+                And there are only \(2^{13} = 8{,}192\) possible rank sets since
+                each rank either appears or it doesn't. This is far fewer than
+                the total number of hands
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section class="no-title">
+          <div class="two-col" style="align-items: center; gap: 40px">
+            <div style="flex: 0 0 260px">
+              <h2 style="text-align: left; font-size: 1.5em; margin: 0">
+                Degeneracy Classes for Eight Cards
+              </h2>
+            </div>
+            <div class="class-grid" style="flex: 0 0 auto">
+              <div class="pic">
+                <img
+                  src="img/doodle/shapes/eight-no-duplicates.png"
+                  alt="3 to 7 of diamonds plus 9, Jack, King"
+                  style="height: 63px"
+                />
+              </div>
+              <div class="multiset">\(\{1^{8}\}\)</div>
+              <div class="name">no duplicates</div>
+              <div class="pic">
+                <img
+                  src="img/doodle/shapes/eight-one-pair.png"
+                  alt="3 to 7 of diamonds plus a second 3, 9 and Jack"
+                  style="height: 77px"
+                />
+              </div>
+              <div class="multiset">\(\{2, 1^{6}\}\)</div>
+              <div class="name">one pair</div>
+              <div class="pic">
+                <img
+                  src="img/doodle/shapes/eight-two-pairs.png"
+                  alt="3 to 7 of diamonds plus a second 3 and 4, and a 9"
+                  style="height: 77px"
+                />
+              </div>
+              <div class="multiset">\(\{2^{2}, 1^{4}\}\)</div>
+              <div class="name">two pairs</div>
+              <div class="pic">
+                <img
+                  src="img/doodle/shapes/eight-three-of-a-kind.png"
+                  alt="3 to 7 of diamonds plus two more 3s and a 9"
+                  style="height: 92px"
+                />
+              </div>
+              <div class="multiset">\(\{3, 1^{5}\}\)</div>
+              <div class="name">three of a kind</div>
+              <div class="pic">
+                <img
+                  src="img/doodle/shapes/eight-three-pairs.png"
+                  alt="3 to 7 of diamonds plus a second 3, 4 and 5"
+                  style="height: 77px"
+                />
+              </div>
+              <div class="multiset">\(\{2^{3}, 1^{2}\}\)</div>
+              <div class="name">three pairs</div>
+              <div class="pic">
+                <img
+                  src="img/doodle/shapes/eight-full-house.png"
+                  alt="3 to 7 of diamonds plus two more 3s and a second 4"
+                  style="height: 92px"
+                />
+              </div>
+              <div class="multiset">\(\{3, 2, 1^{3}\}\)</div>
+              <div class="name">full house</div>
+              <div class="pic">
+                <img
+                  src="img/doodle/shapes/eight-four-of-a-kind.png"
+                  alt="3 to 7 of diamonds plus three more 3s"
+                  style="height: 106px"
+                />
+              </div>
+              <div class="multiset">\(\{4, 1^{4}\}\)</div>
+              <div class="name">four of a kind</div>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2>One Hand, Four Choices</h2>
+          <div class="pairing" style="gap: 10px 44px">
+            <div class="pairing-row">
+              <div
+                class="picture img-white-bg"
+                style="padding: 0; line-height: 0"
+              >
+                <img
+                  src="img/doodle/general/build-class.png"
+                  alt="The shape {3, 2, 1^3} as blank cards: a column of three, a column of two, three singles"
+                  style="height: 100px; margin: 0; padding: 8px 12px"
+                />
+              </div>
+              <div class="maths" style="font-size: 0.85em">
+                1. Choose a degeneracy class: (e.g. \(\{3, 2, 1^3\}\))
+              </div>
+            </div>
+            <div class="pairing-row fragment">
+              <div
+                class="picture img-white-bg"
+                style="padding: 0; line-height: 0"
+              >
+                <img
+                  src="img/doodle/general/build-rank-set.png"
+                  alt="The rank set 3 4 5 6 7"
+                  style="height: 70px; margin: 0; padding: 8px 12px"
+                />
+              </div>
+              <div class="maths" style="font-size: 0.85em">
+                2. Choose a rank set that contains a straight (e.g. 3 to 7)
+              </div>
+            </div>
+            <div class="pairing-row fragment">
+              <div
+                class="picture img-white-bg"
+                style="padding: 0; line-height: 0"
+              >
+                <img
+                  src="img/doodle/general/build-placement.png"
+                  alt="The triple on the 3 in yellow, the pair on the 4 in pink, singles on 5, 6, 7"
+                  style="height: 100px; margin: 0; padding: 8px 12px"
+                />
+              </div>
+              <div class="maths" style="font-size: 0.85em">
+                3. Choose a placement (e.g. 3 gets to be a triple, 4 gets to be
+                a pair)
+              </div>
+            </div>
+            <div class="pairing-row fragment">
+              <div
+                class="picture img-white-bg"
+                style="padding: 0; line-height: 0"
+              >
+                <img
+                  src="img/doodle/general/build-suits.png"
+                  alt="The hand 3 3 3 4 4 5 6 7 with suits"
+                  style="height: 100px; margin: 0; padding: 8px 12px"
+                />
+              </div>
+              <div class="maths" style="font-size: 0.85em">
+                4. Choose suits for every card
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2>A General Approach</h2>
+          <ol style="font-size: 0.85em">
+            <li class="fragment">Choose a degeneracy class, \(d\)</li>
+            <li class="fragment">
+              Choose a rank set that contains a straight: \(S(r)\) ways
+            </li>
+            <li class="fragment">
+              Place the card counts on those ranks: \(P(d)\) ways
+            </li>
+            <li class="fragment">Choose the suits: \(Su(d)\) ways</li>
+            <li class="fragment">
+              Every hand comes from exactly one chain of choices, and since the
+              choices after fixing the degeneracy class are independent we can
+              just multiply them! \(S(r) \times P(d) \times Su(d)\)
+            </li>
+            <li class="fragment">Sum over the degeneracy classes</li>
+          </ol>
+          <p class="fragment" style="font-size: 0.95em; margin-top: 0.2em">
+            $$\text{hands with a straight} = \sum_{d} S(r)\, P(d)\, Su(d)$$
+          </p>
+        </section>
+
+        <section>
+          <h2>Maths or Code?</h2>
+          <div
+            style="
+              display: grid;
+              grid-template-columns: 1fr 1fr;
+              column-gap: 60px;
+              row-gap: 0;
+              align-items: end;
+              text-align: left;
+            "
+          >
+            <p class="column-title">We can derive a formula</p>
+            <p class="column-title fragment" data-fragment-index="0">
+              I was unable to derive a formula so used Scala
+            </p>
+            <div style="align-self: start">
+              <ul style="font-size: 0.85em">
+                <li>\(P(d)\), the placements</li>
+                <li>\(Su(d)\), the suits</li>
+              </ul>
+            </div>
+            <div style="align-self: start">
+              <ul
+                class="fragment"
+                data-fragment-index="0"
+                style="font-size: 0.85em"
+              >
+                <li>Listing every degeneracy class \(d\) for a hand size</li>
+                <li>\(S(r)\), the rank sets with a straight</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <section>
+            <h2>Placements</h2>
+            <div class="figure-row">
+              <div class="caption" style="flex: 1 1 560px; font-size: 0.58em">
+                <p class="column-title">
+                  \(\{\textcolor{#fcecb0}{\mathbf{3}},
+                  \textcolor{#ffd6da}{\mathbf{2}},
+                  \textcolor{#ffffff}{\mathbf{1}}^3\}\)
+                </p>
+                <p style="font-size: 0.85em; color: #bbb">
+                  <span class="swatch" style="background: #fcecb0"></span> the
+                  triple &nbsp;
+                  <span class="swatch" style="background: #ffd6da"></span> the
+                  pair
+                </p>
+
+                <p class="fragment">
+                  \(P(d)\) is the number of distinct orderings of
+                  \(\{\textcolor{#fcecb0}{\mathbf{3}},
+                  \textcolor{#ffd6da}{\mathbf{2}},
+                  \textcolor{#ffffff}{\mathbf{1}},
+                  \textcolor{#ffffff}{\mathbf{1}},
+                  \textcolor{#ffffff}{\mathbf{1}}\}\) along the ranks 3 to 7
+                </p>
+                <p class="fragment">
+                  \(P(d) =
+                  \dfrac{5!}{\textcolor{#fcecb0}{\mathbf{1!}}\,\textcolor{#ffd6da}{\mathbf{1!}}\,\textcolor{#ffffff}{\mathbf{3!}}}
+                  = \dfrac{120}{6} = 20\)
+                </p>
+                <p class="fragment">
+                  Another way to think about this would be to consider which
+                  rank gets to be a triple (5 choices) and then which rank gets
+                  to be a pair (4 choices.) But we shall see that the
+                  "orderings" approach is more generalisable
+                </p>
+              </div>
+              <div class="figure img-white-bg">
+                <img
+                  src="img/doodle/general/placements-3-2-1.png"
+                  alt="All 20 placements: one row per triple rank, the pair moving along the other four"
+                  style="max-height: 360px"
+                />
+              </div>
+            </div>
+          </section>
+
+          <section>
+            <h2>Placements: a Harder One</h2>
+            <div class="figure-row">
+              <div class="caption" style="flex: 1 1 560px; font-size: 0.62em">
+                <p class="column-title">
+                  \(\{\textcolor{#fcecb0}{\mathbf{3}},
+                  \textcolor{#ffd6da}{\mathbf{2}}^2,
+                  \textcolor{#ffffff}{\mathbf{1}}^2\}\)
+                </p>
+                <p style="font-size: 0.85em; color: #bbb">
+                  <span class="swatch" style="background: #fcecb0"></span> the
+                  triple &nbsp;
+                  <span class="swatch" style="background: #ffd6da"></span> the
+                  pairs
+                </p>
+                <p>
+                  9 cards: a triple, two pairs and two singles, on the ranks 3
+                  to 7
+                </p>
+                <p class="fragment">
+                  \(P(d)\) is the number of distinct orderings of
+                  \(\{\textcolor{#fcecb0}{\mathbf{3}},
+                  \textcolor{#ffd6da}{\mathbf{2}},
+                  \textcolor{#ffd6da}{\mathbf{2}},
+                  \textcolor{#ffffff}{\mathbf{1}},
+                  \textcolor{#ffffff}{\mathbf{1}}\}\)
+                </p>
+                <p class="fragment">
+                  \(P(d) =
+                  \dfrac{5!}{\textcolor{#fcecb0}{\mathbf{1!}}\,\textcolor{#ffd6da}{\mathbf{2!}}\,\textcolor{#ffffff}{\mathbf{2!}}}
+                  = \dfrac{120}{4} = 30\)
+                </p>
+                <p class="fragment">
+                  5 choices for the triple, then \(\binom{4}{2} = 6\) for the
+                  two pairs: \(5 \times 6 = 30\)
+                </p>
+              </div>
+              <div class="figure img-white-bg">
+                <img
+                  src="img/doodle/general/placements-all-30.png"
+                  alt="All 30 placements of a triple, two pairs and two singles on the ranks 3 to 7; triple tinted yellow, pairs pink"
+                  style="max-height: 270px"
+                />
+              </div>
+            </div>
+          </section>
+        </section>
+
+        <section>
+          <section>
+            <h2>Multinomial Coefficients</h2>
+            <div class="two-col" style="align-items: center; gap: 56px">
+              <div style="flex: 0 0 auto">
+                <table class="orderings">
+                  <thead>
+                    <tr>
+                      <th>3</th>
+                      <th>4</th>
+                      <th>5</th>
+                      <th>6</th>
+                      <th>7</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>\(\textcolor{#fcecb0}{\mathbf{3}}\)</td>
+                      <td>\(\textcolor{#ffd6da}{\mathbf{2}}\)</td>
+                      <td>\(\textcolor{#ffffff}{\mathbf{1_A}}\)</td>
+                      <td>\(\textcolor{#ffffff}{\mathbf{1_B}}\)</td>
+                      <td>\(\textcolor{#ffffff}{\mathbf{1_C}}\)</td>
+                    </tr>
+                    <tr>
+                      <td>\(\textcolor{#fcecb0}{\mathbf{3}}\)</td>
+                      <td>\(\textcolor{#ffd6da}{\mathbf{2}}\)</td>
+                      <td>\(\textcolor{#ffffff}{\mathbf{1_A}}\)</td>
+                      <td>\(\textcolor{#ffffff}{\mathbf{1_C}}\)</td>
+                      <td>\(\textcolor{#ffffff}{\mathbf{1_B}}\)</td>
+                    </tr>
+                    <tr>
+                      <td>\(\textcolor{#fcecb0}{\mathbf{3}}\)</td>
+                      <td>\(\textcolor{#ffd6da}{\mathbf{2}}\)</td>
+                      <td>\(\textcolor{#ffffff}{\mathbf{1_B}}\)</td>
+                      <td>\(\textcolor{#ffffff}{\mathbf{1_A}}\)</td>
+                      <td>\(\textcolor{#ffffff}{\mathbf{1_C}}\)</td>
+                    </tr>
+                    <tr>
+                      <td>\(\textcolor{#fcecb0}{\mathbf{3}}\)</td>
+                      <td>\(\textcolor{#ffd6da}{\mathbf{2}}\)</td>
+                      <td>\(\textcolor{#ffffff}{\mathbf{1_B}}\)</td>
+                      <td>\(\textcolor{#ffffff}{\mathbf{1_C}}\)</td>
+                      <td>\(\textcolor{#ffffff}{\mathbf{1_A}}\)</td>
+                    </tr>
+                    <tr>
+                      <td>\(\textcolor{#fcecb0}{\mathbf{3}}\)</td>
+                      <td>\(\textcolor{#ffd6da}{\mathbf{2}}\)</td>
+                      <td>\(\textcolor{#ffffff}{\mathbf{1_C}}\)</td>
+                      <td>\(\textcolor{#ffffff}{\mathbf{1_A}}\)</td>
+                      <td>\(\textcolor{#ffffff}{\mathbf{1_B}}\)</td>
+                    </tr>
+                    <tr>
+                      <td>\(\textcolor{#fcecb0}{\mathbf{3}}\)</td>
+                      <td>\(\textcolor{#ffd6da}{\mathbf{2}}\)</td>
+                      <td>\(\textcolor{#ffffff}{\mathbf{1_C}}\)</td>
+                      <td>\(\textcolor{#ffffff}{\mathbf{1_B}}\)</td>
+                      <td>\(\textcolor{#ffffff}{\mathbf{1_A}}\)</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <p style="font-size: 0.55em; margin: 0.4em 0 0 0; color: #bbb">
+                  ranks across the top, card counts below:<br />six line-ups,
+                  one placement
+                </p>
+              </div>
+              <div class="stack-text" style="flex: 1 1 auto; font-size: 0.68em">
+                <p>
+                  Label the singles A, B and C:
+                  \(\{\textcolor{#fcecb0}{\mathbf{3}},
+                  \textcolor{#ffd6da}{\mathbf{2}},
+                  \textcolor{#ffffff}{\mathbf{1_A}},
+                  \textcolor{#ffffff}{\mathbf{1_B}},
+                  \textcolor{#ffffff}{\mathbf{1_C}}\}\) lines up in \(5! = 120\)
+                  ways
+                </p>
+                <p class="fragment">
+                  Shuffling the labels changes nothing: every placement shows up
+                  \(3! = 6\) times
+                </p>
+                <p class="fragment">
+                  \(P =
+                  \dfrac{5!}{\textcolor{#fcecb0}{\mathbf{1!}}\,\textcolor{#ffd6da}{\mathbf{1!}}\,\textcolor{#ffffff}{\mathbf{3!}}}
+                  = \dfrac{120}{6} = 20\)
+                </p>
+                <p class="fragment">
+                  That is a
+                  <span class="hl-word">multinomial coefficient</span>,
+                  \(\binom{5}{\textcolor{#fcecb0}{\mathbf{1}},\,\textcolor{#ffd6da}{\mathbf{1}},\,\textcolor{#ffffff}{\mathbf{3}}}\):
+                  the distinct orderings of a multiset
+                </p>
+                <p class="fragment">
+                  \((\textcolor{#fcecb0}{\boldsymbol{x}}+\textcolor{#ffd6da}{\boldsymbol{y}}+\textcolor{#ffffff}{\boldsymbol{z}})^5\):
+                  the coefficient of
+                  \(\textcolor{#fcecb0}{\boldsymbol{x}}\,\textcolor{#ffd6da}{\boldsymbol{y}}\,\textcolor{#ffffff}{\boldsymbol{z}}^3\)
+                  is
+                  \(\binom{5}{\textcolor{#fcecb0}{\mathbf{1}},\,\textcolor{#ffd6da}{\mathbf{1}},\,\textcolor{#ffffff}{\mathbf{3}}}
+                  = 20\), the orderings of
+                  \(\textcolor{#fcecb0}{\boldsymbol{x}}\,\textcolor{#ffd6da}{\boldsymbol{y}}\,\textcolor{#ffffff}{\boldsymbol{z}}\,\textcolor{#ffffff}{\boldsymbol{z}}\,\textcolor{#ffffff}{\boldsymbol{z}}\)
+                </p>
+                <p class="fragment">
+                  A binomial is just the two-bucket case: \(\binom{n}{k} =
+                  \binom{n}{k,\,n-k}\)
+                </p>
+              </div>
+            </div>
+          </section>
+          <section>
+            <h2>Multinomial Coefficients: a Harder One</h2>
+            <div
+              class="stack-text"
+              style="font-size: 0.8em; max-width: 1000px; margin: 0 auto"
+            >
+              <p>
+                \(\{\textcolor{#fcecb0}{\mathbf{3}},
+                \textcolor{#ffd6da}{\mathbf{2}},
+                \textcolor{#ffd6da}{\mathbf{2}},
+                \textcolor{#ffffff}{\mathbf{1}},
+                \textcolor{#ffffff}{\mathbf{1}}\}\): a triple, two pairs and two
+                singles
+              </p>
+              <p class="fragment">
+                Label the pairs A and B, and the singles A and B:
+                \(\{\textcolor{#fcecb0}{\mathbf{3}},
+                \textcolor{#ffd6da}{\mathbf{2_A}},
+                \textcolor{#ffd6da}{\mathbf{2_B}},
+                \textcolor{#ffffff}{\mathbf{1_A}},
+                \textcolor{#ffffff}{\mathbf{1_B}}\}\) lines up in \(5! = 120\)
+                ways
+              </p>
+              <p class="fragment">
+                Swapping the two pairs changes nothing: divide by
+                \(\textcolor{#ffd6da}{\mathbf{2!}}\)
+              </p>
+              <p class="fragment">
+                Swapping the two singles changes nothing either: divide by
+                \(\textcolor{#ffffff}{\mathbf{2!}}\) again
+              </p>
+              <p class="fragment">
+                \(P =
+                \dfrac{5!}{\textcolor{#fcecb0}{\mathbf{1!}}\,\textcolor{#ffd6da}{\mathbf{2!}}\,\textcolor{#ffffff}{\mathbf{2!}}}
+                = \dfrac{120}{4} = 30 =
+                \binom{5}{\textcolor{#fcecb0}{\mathbf{1}},\,\textcolor{#ffd6da}{\mathbf{2}},\,\textcolor{#ffffff}{\mathbf{2}}}\)
+              </p>
+              <p class="fragment">
+                \((\textcolor{#fcecb0}{\boldsymbol{x}}+\textcolor{#ffd6da}{\boldsymbol{y}}+\textcolor{#ffffff}{\boldsymbol{z}})^5\):
+                the coefficient of
+                \(\textcolor{#fcecb0}{\boldsymbol{x}}\,\textcolor{#ffd6da}{\boldsymbol{y}}^2\,\textcolor{#ffffff}{\boldsymbol{z}}^2\)
+                is 30, the orderings of
+                \(\textcolor{#fcecb0}{\boldsymbol{x}}\,\textcolor{#ffd6da}{\boldsymbol{y}}\,\textcolor{#ffd6da}{\boldsymbol{y}}\,\textcolor{#ffffff}{\boldsymbol{z}}\,\textcolor{#ffffff}{\boldsymbol{z}}\)
+              </p>
+            </div>
+          </section>
+        </section>
+
+        <section>
+          <h2>Multinomial Coefficients Formula</h2>
+          <p style="font-size: 1.3em">
+            $$\binom{n}{k_{1}, k_{2}, \ldots, k_{m}} = \frac{n!}{k_{1}! k_{2}!
+            \cdots k_{m}!}$$
+          </p>
+          <p class="fragment" style="font-size: 0.85em">
+            The number of distinct orderings of a multiset of \(n\) elements,
+            where \(k_i\) is the multiplicity of the \(i\)th element
+          </p>
+          <p class="fragment" style="font-size: 0.85em">
+            so \(n = k_1 + k_2 + \cdots + k_m\)
+          </p>
+        </section>
+
+        <section>
+          <h2>The Suit Factor</h2>
+          <div class="figure-row">
+            <div class="caption" style="flex: 1 1 600px; font-size: 0.66em">
+              <p class="column-title">\(\{3^1, 2^1, 1^3\}\)</p>
+              <p>Under each rank, every way to assign the suits</p>
+              <table
+                class="fragment"
+                style="
+                  font-size: 0.95em;
+                  white-space: nowrap;
+                  margin: 0 0 0.6em 0;
+                "
+              >
+                <thead>
+                  <tr>
+                    <th>card count</th>
+                    <th class="num">multiplicity</th>
+                    <th class="num">suit factor</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>3</td>
+                    <td class="num">1</td>
+                    <td class="num">\(\binom{4}{3} = 4\)</td>
+                  </tr>
+                  <tr>
+                    <td>2</td>
+                    <td class="num">1</td>
+                    <td class="num">\(\binom{4}{2} = 6\)</td>
+                  </tr>
+                  <tr>
+                    <td>1</td>
+                    <td class="num">3</td>
+                    <td class="num">\(\binom{4}{1}^{3} = 64\)</td>
+                  </tr>
+                </tbody>
+              </table>
+              <p class="fragment">
+                \(Su(d) = \binom{4}{3}\binom{4}{2}\binom{4}{1}^3\)
+              </p>
+              <p class="fragment">\(= 4 \times 6 \times 64 = 1{,}536\)</p>
+            </div>
+            <div class="figure img-white-bg">
+              <img
+                src="img/doodle/general/suit-factor-3-2-1.png"
+                alt="The hand 3 3 3 4 4 5 6 7 with every suit choice listed under each rank: 4, 6, 4, 4, 4"
+                style="max-height: 400px"
+              />
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2>A General Degeneracy Class</h2>
+          <p style="font-size: 0.62em; margin: 0 0 0.2em 0">
+            \(\{3, 2, 1^3\}\): card counts \(a_1, a_2, a_3 = 3, 2, 1\);
+            multiplicities \(m(3) = 1,\ m(2) = 1,\ m(1) = 3\); \(t = 3\); \(r =
+            5\)
+          </p>
+          <p class="fragment" style="font-size: 1.1em">
+            $$\{ a_{1}^{m(a_{1})} , a_{2}^{m(a_{2})} , \ldots , a_{t}^{m(a_{t})}
+            \}$$
+          </p>
+          <div class="definitions fragment" style="font-size: 0.85em">
+            <div>
+              <span class="maths">\(a_i\)</span>
+              <span class="words"
+                >how many cards of a rank, between 1 and 4; \(t\) distinct
+                values</span
+              >
+            </div>
+            <div>
+              <span class="maths">\(m(a_i)\)</span>
+              <span class="words"
+                >a function that gives the multiplicity of each element: how
+                many ranks have \(a_i\) cards</span
+              >
+            </div>
+            <div>
+              <span class="maths">\(r = \sum_{i=1}^{t} m(a_i)\)</span>
+              <span class="words">the number of distinct ranks</span>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2>The Formulae</h2>
+          <p class="fragment">
+            $$Su(\{a_1^{m(a_1)}, \ldots, a_t^{m(a_t)}\}) = \prod_{i=1}^{t}
+            \binom{4}{a_i}^{m(a_i)}$$
+          </p>
+          <p class="fragment" style="font-size: 0.85em">
+            $$\begin{aligned} P(\{a_1^{m(a_1)},a_2^{m(a_2)} \ldots,
+            a_t^{m(a_t)}\}) &= \binom{r}{m(a_1),m(a_2), \ldots, m(a_t)} \\ &=
+            \frac{r!}{m(a_1)!m(a_2)!\cdots m(a_t)!} \end{aligned}$$
+          </p>
+        </section>
+
+        <section>
+          <h2>Eight Cards</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>class</th>
+                <th>multiset</th>
+                <th class="num">\(r\)</th>
+                <th class="num">\(S(r)\)</th>
+                <th class="num">\(P(d)\)</th>
+                <th class="num">\(Su(d)\)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>no duplicates</td>
+                <td>\(\{1^{8}\}\)</td>
+                <td class="num">8</td>
+                <td class="num"><span class="hl-word">?</span></td>
+                <td class="num">\(\binom{8}{8} = 1\)</td>
+                <td class="num">\(\binom{4}{1}^{8} = 65{,}536\)</td>
+              </tr>
+              <tr>
+                <td>one pair</td>
+                <td>\(\{2^{1}, 1^{6}\}\)</td>
+                <td class="num">7</td>
+                <td class="num"><span class="hl-word">?</span></td>
+                <td class="num">\(\binom{7}{1,6} = 7\)</td>
+                <td class="num">\(\binom{4}{2}\binom{4}{1}^{6} = 24{,}576\)</td>
+              </tr>
+              <tr>
+                <td>two pairs</td>
+                <td>\(\{2^{2}, 1^{4}\}\)</td>
+                <td class="num">6</td>
+                <td class="num">71</td>
+                <td class="num">\(\binom{6}{2,4} = 15\)</td>
+                <td class="num">
+                  \(\binom{4}{2}^{2}\binom{4}{1}^{4} = 9{,}216\)
+                </td>
+              </tr>
+              <tr>
+                <td>three of a kind</td>
+                <td>\(\{3^{1}, 1^{5}\}\)</td>
+                <td class="num">6</td>
+                <td class="num">71</td>
+                <td class="num">\(\binom{6}{1,5} = 6\)</td>
+                <td class="num">\(\binom{4}{3}\binom{4}{1}^{5} = 4{,}096\)</td>
+              </tr>
+              <tr>
+                <td>three pairs</td>
+                <td>\(\{2^{3}, 1^{2}\}\)</td>
+                <td class="num">5</td>
+                <td class="num">10</td>
+                <td class="num">\(\binom{5}{3,2} = 10\)</td>
+                <td class="num">
+                  \(\binom{4}{2}^{3}\binom{4}{1}^{2} = 3{,}456\)
+                </td>
+              </tr>
+              <tr>
+                <td>full house</td>
+                <td>\(\{3^{1}, 2^{1}, 1^{3}\}\)</td>
+                <td class="num">5</td>
+                <td class="num">10</td>
+                <td class="num">\(\binom{5}{1,1,3} = 20\)</td>
+                <td class="num">
+                  \(\binom{4}{3}\binom{4}{2}\binom{4}{1}^{3} = 1{,}536\)
+                </td>
+              </tr>
+              <tr>
+                <td>four of a kind</td>
+                <td>\(\{4^{1}, 1^{4}\}\)</td>
+                <td class="num">5</td>
+                <td class="num">10</td>
+                <td class="num">\(\binom{5}{1,4} = 5\)</td>
+                <td class="num">\(\binom{4}{4}\binom{4}{1}^{4} = 256\)</td>
+              </tr>
+            </tbody>
+          </table>
+          <p class="fragment subtitle" style="margin-top: 0.6em">
+            We have a "nice" formula for two columns but not for \(S\) sadly.
+          </p>
+        </section>
+
+        <section class="no-title">
+          <div class="full-width">
+            <img
+              src="img/silly/cat.jpg"
+              alt="A cat"
+              style="max-height: 620px; width: auto"
+            />
+          </div>
+        </section>
+
+        <!-- ============================================ -->
+        <!-- THE GENERAL CASE, IN SCALA                   -->
+        <!-- ============================================ -->
+
+        <section class="small-code">
+          <h2>The "Algorithm" in Scala</h2>
+          <p style="font-size: 0.85em; margin: 0">
+            $$\text{hands with a straight} = \sum_{d} S(r)\, P(d)\, Su(d)$$
+          </p>
+          <pre><code class="language-scala" data-trim data-line-numbers="1-6|2|3-5|6|8-11"><script type="text/template">
+def computeStraightCount(handSize: Int): Long =
+  getDegeneracyClasses(handSize)
+    .map { d =>
+      countStraightRankSets(d) * placementFactor(d) * suitFactor(d)
+    }
+    .sum
+
+def getDegeneracyClasses(handSize: Int): List[DegeneracyClass] = ???
+def countStraightRankSets(d: DegeneracyClass): Long = ???
+def placementFactor(d: DegeneracyClass): Long = ???
+def suitFactor(d: DegeneracyClass): Long = ???
+          
+</script></code></pre>
+
+        </section>
+
+        <section>
+          <h2>Integer Partitions of 8</h2>
+          <p style="font-size: 0.7em; margin: 0 0 0.3em 0">
+            An <span class="hl-word">integer partition</span> of 8 writes 8 as a
+            sum of positive whole numbers, order ignored
+          </p>
+          <table>
+            <thead>
+              <tr>
+                <th>class</th>
+                <th>partition of 8</th>
+                <th>multiset</th>
+                <th class="num">\(r\)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>no duplicates</td>
+                <td>\(1{+}1{+}1{+}1{+}1{+}1{+}1{+}1\)</td>
+                <td>\(\{1^{8}\}\)</td>
+                <td class="num">8</td>
+              </tr>
+              <tr>
+                <td>one pair</td>
+                <td>\(2{+}1{+}1{+}1{+}1{+}1{+}1\)</td>
+                <td>\(\{2^{1}, 1^{6}\}\)</td>
+                <td class="num">7</td>
+              </tr>
+              <tr>
+                <td>two pairs</td>
+                <td>\(2{+}2{+}1{+}1{+}1{+}1\)</td>
+                <td>\(\{2^{2}, 1^{4}\}\)</td>
+                <td class="num">6</td>
+              </tr>
+              <tr>
+                <td>three of a kind</td>
+                <td>\(3{+}1{+}1{+}1{+}1{+}1\)</td>
+                <td>\(\{3^{1}, 1^{5}\}\)</td>
+                <td class="num">6</td>
+              </tr>
+              <tr>
+                <td>three pairs</td>
+                <td>\(2{+}2{+}2{+}1{+}1\)</td>
+                <td>\(\{2^{3}, 1^{2}\}\)</td>
+                <td class="num">5</td>
+              </tr>
+              <tr>
+                <td>full house</td>
+                <td>\(3{+}2{+}1{+}1{+}1\)</td>
+                <td>\(\{3^{1}, 2^{1}, 1^{3}\}\)</td>
+                <td class="num">5</td>
+              </tr>
+              <tr>
+                <td>four of a kind</td>
+                <td>\(4{+}1{+}1{+}1{+}1\)</td>
+                <td>\(\{4^{1}, 1^{4}\}\)</td>
+                <td class="num">5</td>
+              </tr>
+            </tbody>
+          </table>
+          <p class="fragment subtitle">
+            There are actually 22 partitions of 8 but only 7 of them are
+            relevant to us.
+          </p>
+          <p class="fragment subtitle" style="margin-top: 0.2em">
+            Parts of at most 4, because there are 4 suits. At least 5 parts,
+            because a straight needs 5 ranks
+          </p>
+        </section>
+
+        <section>
+          <section class="small-code">
+            <h2>Degeneracy Classes, in Scala</h2>
+            <pre><code class="language-scala" data-trim data-line-numbers="1-2|4"><script type="text/template">
+type CardCount = Int :| Interval.Closed[1, 4]
+type Frequency = Int :| Positive
+
+type DegeneracyClass = Map[CardCount, Frequency]
+            
+</script></code></pre>
+            <p class="subtitle">
+              \(\{2^2, 1^4\}\) is
+              <code class="language-scala">Map(2 -> 2, 1 -> 4)</code>: card
+              count to multiplicity
+            </p>
+            <p class="fragment subtitle" style="margin-top: 0">
+              <code class="language-scala">:|</code> is iron: a refined
+              <code class="language-scala">Int</code> the compiler knows is in
+              range
+            </p>
+            <pre
+              class="fragment"
+            ><code class="language-scala" data-trim data-line-numbers="1-7|9-12"><script type="text/template">
+def integerPartitions(n: Int, maxPart: Int): List[List[Int]] =
+  if n == 0 then List(Nil)
+  else
+    for
+      part <- (1 to math.min(n, maxPart)).toList
+      tail <- integerPartitions(n - part, part)
+    yield part :: tail
+
+def getDegeneracyClasses(handSize: Int): List[DegeneracyClass] =
+  integerPartitions(handSize, maxPart = 4)
+    .filter(_.length >= 5)
+    .map(DegeneracyClass.fromParts)
+            
+</script></code></pre>
+          </section>
+          <section>
+            <h2>Partitions of 6, Recursively</h2>
+            <div class="full-width img-white-bg">
+              <img
+                src="img/doodle/recursion/partition-tree-6.png"
+                alt="The recursion tree of integerPartitions(6, maxPart = 4): each branch picks the next part, no bigger than the one before; nine leaves, of which 1+1+1+1+1+1 and 2+1+1+1+1 are green"
+                style="max-height: 330px"
+              />
+            </div>
+            <p style="font-size: 0.7em; margin-top: 0.4em">
+              Each branch picks the next part, never bigger than the one before;
+              <code class="language-scala">maxPart = 4</code> rules out 5 and 6
+            </p>
+            <p class="fragment" style="font-size: 0.7em">
+              <span style="color: #2e8b57">&#9679;</span> at least 5 parts, kept
+              &nbsp; <span style="color: #a9a9a9">&#9679;</span> dropped by the
+              filter
+            </p>
+            <p class="fragment" style="font-size: 0.7em">
+              The two survivors are the two six-card templates: \(\{1^6\}\) and
+              \(\{2, 1^4\}\)
+            </p>
+          </section>
+          <section class="small-code">
+            <h2>From Parts to a Multiset</h2>
+            <pre><code class="language-scala" data-trim data-line-numbers="1-10|2-3|5-7|9-10"><script type="text/template">
+object DegeneracyClass:
+  def fromParts(parts: List[Int]): DegeneracyClass =
+    toMultiset(parts.map(_.refineUnsafe[Interval.Closed[1, 4]]))
+
+  private def toMultiset(parts: List[CardCount]): DegeneracyClass =
+    parts
+      .groupMapReduce(identity)(Function.const(1: Frequency))(addFrequencies)
+
+  private def addFrequencies(x: Frequency, y: Frequency): Frequency =
+    (x + y).assume[Positive]
+</script></code></pre>
+            <p class="subtitle">
+              <code class="language-scala">List(2, 2, 1, 1, 1, 1)</code> becomes
+              <code class="language-scala">Map(2 -> 2, 1 -> 4)</code>
+            </p>
+            <p class="fragment subtitle">
+              <code class="language-scala">groupMapReduce</code>: group equal
+              parts, map each to 1, add up the 1s
+            </p>
+          </section>
+          <section>
+            <h2>Eight Cards, Seven Classes</h2>
+            <pre><code class="language-plaintext" data-trim><script type="text/template">
+found 7 degen classes for hand size of 8:
+  {1⁸}
+  {2, 1⁶}
+  {2², 1⁴}
+  {2³, 1²}
+  {3, 1⁵}
+  {3, 2, 1³}
+  {4, 1⁴}
+            
+</script></code></pre>
+            <p class="subtitle">
+              This is what my <code class="language-scala">Show</code> instance
+              (cats' type class for printing) spits out
+            </p>
+          </section>
+        </section>
+
+        <section class="small-code">
+          <h2>Placements, in Scala</h2>
+          <p style="font-size: 0.85em; margin: 0">
+            $$\begin{aligned} P(\{a_1^{m(a_1)},a_2^{m(a_2)} \ldots,
+            a_t^{m(a_t)}\}) &= \binom{r}{m(a_1),m(a_2), \ldots, m(a_t)} \\ &=
+            \frac{r!}{m(a_1)!m(a_2)!\cdots m(a_t)!} \end{aligned}$$
+          </p>
+          <pre><code class="language-scala" data-trim data-line-numbers="1-2|4-5|7-8"><script type="text/template">
+def placementFactor(d: DegeneracyClass): Long =
+  multinomial(d.values.toList)
+
+def multinomial(ks: List[Int]): Long =
+  (factorial(ks.sum) / ks.map(factorial).product).toLong
+
+def factorial(n: Int): BigInt =
+  (1 to n).map(BigInt.apply).product
+</script></code></pre>
+          <p class="fragment subtitle">
+            <code class="language-scala">d.values</code> are the multiplicities
+            \(m(a_i)\), and they add up to \(r\)
+          </p>
+        </section>
+
+        <section class="small-code">
+          <h2>The Suit Factor, in Scala</h2>
+          <p style="font-size: 0.7em; margin: 0">
+            $$Su(\{a_1^{m(a_1)}, \ldots, a_t^{m(a_t)}\}) = \prod_{i=1}^{t}
+            \binom{4}{a_i}^{m(a_i)}$$
+          </p>
+          <pre><code class="language-scala" data-trim data-line-numbers="1-4|3|6-7|9-11"><script type="text/template">
+def suitFactor(d: DegeneracyClass): Long =
+  d.toList
+    .map((cardCount, frequency) => binomial(4, cardCount) `pow` frequency)
+    .product
+
+def binomial(n: Int, k: Int): Long =
+  (factorial(n) / factorial(n - k) / factorial(k)).toLong
+
+extension (l: Long)
+  def pow(exponent: Int): Long =
+    BigInt(l).pow(exponent).toLong
+</script></code></pre>
+        </section>
+
+        <section>
+          <section class="small-code">
+            <h2>Rank Sets With a Straight</h2>
+            <pre><code class="language-scala" data-trim data-line-numbers="1|3-4|6-8|9-12"><script type="text/template">
+type RankSet = Set[Rank]
+
+def countStraightRankSets(d: DegeneracyClass): Long =
+  rankSetsWithStraight(d.values.sum).size
+
+def rankSetsWithStraight(r: Int): Set[RankSet] =
+  if r < 5 then Set.empty
+  else if r == 5 then allFiveRankStraights
+  else
+    for
+      rankSet   <- rankSetsWithStraight(r - 1)
+      otherRank <- Rank.values.toSet diff rankSet
+    yield rankSet + otherRank
+            
+</script></code></pre>
+            <p class="fragment subtitle">
+              Base case: the ten straights (<code class="language-scala"
+                >allFiveRankStraights</code
+              >, next slide). Step: add any rank the set doesn't have; still a
+              straight. Repeat.
+            </p>
+          </section>
+          <section class="small-code">
+            <h2>The Ten Straights</h2>
+            <pre><code class="language-scala" data-trim data-line-numbers="1-2|4-5|7-8"><script type="text/template">
+lazy val allFiveRankStraights: Set[RankSet] =
+  Iterator.iterate(Rank.Ace)(_.nextRank).take(10).map(mkFiveCardStraight).toSet
+
+def mkFiveCardStraight(start: Rank): RankSet =
+  Iterator.iterate(start)(_.nextRank).take(5).toSet
+
+extension (r: Rank)
+  def nextRank: Rank = Rank.fromOrdinal((r.ordinal + 1) % 13)
+            
+</script></code></pre>
+            <p class="subtitle">
+              Ten starting ranks, Ace to Ten. The
+              <code class="language-scala">% 13</code> wraps King round to Ace,
+              so Ten gives T J Q K A. Nothing starts above Ten, so nothing wraps
+              any further: no Q K A 2 3.
+            </p>
+          </section>
+          <section>
+            <h2>Rank Sets With a Straight: One Step</h2>
+            <div class="full-width img-white-bg">
+              <img
+                src="img/doodle/recursion/rank-set-step.png"
+                alt="Two straights, 3 to 7 and 4 to 8, each extended by three extra ranks shown in yellow; the run 3 to 8 is built from both (pink) and appears once in the deduplicated set on the right"
+                style="max-height: 350px"
+              />
+            </div>
+            <p style="font-size: 0.7em; margin-top: 0.4em">
+              <span class="swatch" style="background: #fcecb0"></span> the added
+              rank &nbsp;
+              <span class="swatch" style="background: #ffd6da"></span> built
+              twice, but deduped because I'm using
+              <code class="language-scala">Set</code>
+            </p>
+            <p class="fragment" style="font-size: 0.62em">
+              Every straight, plus every rank it doesn't have: \(10 \times 8 =
+              80\) rank sets
+            </p>
+            <p class="fragment" style="font-size: 0.62em">
+              Each of the 9 runs of six is built twice, so the
+              <code class="language-scala">Set</code> keeps \(80 - 9 = 71 =
+              S(6)\)
+            </p>
+          </section>
+          <section>
+            <h2>Rank Sets With a Straight, Counted</h2>
+            <pre
+              style="margin-top: 0"
+            ><code class="language-scala" data-trim><script type="text/template">
+(5 to 13).map(r => r -> rankSetsWithStraight(r).size).foreach(println)
+            
+</script></code></pre>
+            <div
+              style="
+                display: flex;
+                gap: 40px;
+                align-items: center;
+                justify-content: center;
+              "
+            >
+              <pre
+                style="margin: 0"
+              ><code class="language-plaintext" data-trim><script type="text/template">
+(5,10)
+(6,71)
+(7,217)
+(8,371)
+(9,384)
+(10,234)
+(11,77)
+(12,13)
+(13,1)
+              
+</script></code></pre>
+              <div
+                class="figure img-white-bg"
+                style="flex: 0 1 auto; min-width: 0"
+              >
+                <img
+                  src="img/doodle/general/rank-set-counts.png"
+                  alt="Bar chart of S(r): 10, 71, 217, 371, 384, 234, 77, 13, 1"
+                  style="max-width: 100%; max-height: 300px"
+                />
+              </div>
+            </div>
+            <p class="fragment subtitle">
+              10 and 71 match what we counted by hand. Not in the OEIS (the
+              On-Line Encyclopedia of Integer Sequences), sadly.
+            </p>
+          </section>
+        </section>
+
+        <section>
+          <section>
+            <h2>Eight Cards, Again</h2>
+            <table>
+              <thead>
+                <tr>
+                  <th>class</th>
+                  <th>multiset</th>
+                  <th class="num">\(r\)</th>
+                  <th class="num">\(S(r)\)</th>
+                  <th class="num">\(P(d)\)</th>
+                  <th class="num">\(Su(d)\)</th>
+                  <th class="num">product</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>no duplicates</td>
+                  <td>\(\{1^{8}\}\)</td>
+                  <td class="num">8</td>
+                  <td class="num"><span class="hl-word">371</span></td>
+                  <td class="num">\(\binom{8}{8} = 1\)</td>
+                  <td class="num">\(\binom{4}{1}^{8} = 65{,}536\)</td>
+                  <td class="num">24,313,856</td>
+                </tr>
+                <tr>
+                  <td>one pair</td>
+                  <td>\(\{2^{1}, 1^{6}\}\)</td>
+                  <td class="num">7</td>
+                  <td class="num"><span class="hl-word">217</span></td>
+                  <td class="num">\(\binom{7}{1,6} = 7\)</td>
+                  <td class="num">
+                    \(\binom{4}{2}\binom{4}{1}^{6} = 24{,}576\)
+                  </td>
+                  <td class="num">37,330,944</td>
+                </tr>
+                <tr>
+                  <td>two pairs</td>
+                  <td>\(\{2^{2}, 1^{4}\}\)</td>
+                  <td class="num">6</td>
+                  <td class="num">71</td>
+                  <td class="num">\(\binom{6}{2,4} = 15\)</td>
+                  <td class="num">
+                    \(\binom{4}{2}^{2}\binom{4}{1}^{4} = 9{,}216\)
+                  </td>
+                  <td class="num">9,815,040</td>
+                </tr>
+                <tr>
+                  <td>three of a kind</td>
+                  <td>\(\{3^{1}, 1^{5}\}\)</td>
+                  <td class="num">6</td>
+                  <td class="num">71</td>
+                  <td class="num">\(\binom{6}{1,5} = 6\)</td>
+                  <td class="num">
+                    \(\binom{4}{3}\binom{4}{1}^{5} = 4{,}096\)
+                  </td>
+                  <td class="num">1,744,896</td>
+                </tr>
+                <tr>
+                  <td>three pairs</td>
+                  <td>\(\{2^{3}, 1^{2}\}\)</td>
+                  <td class="num">5</td>
+                  <td class="num">10</td>
+                  <td class="num">\(\binom{5}{3,2} = 10\)</td>
+                  <td class="num">
+                    \(\binom{4}{2}^{3}\binom{4}{1}^{2} = 3{,}456\)
+                  </td>
+                  <td class="num">345,600</td>
+                </tr>
+                <tr>
+                  <td>full house</td>
+                  <td>\(\{3^{1}, 2^{1}, 1^{3}\}\)</td>
+                  <td class="num">5</td>
+                  <td class="num">10</td>
+                  <td class="num">\(\binom{5}{1,1,3} = 20\)</td>
+                  <td class="num">
+                    \(\binom{4}{3}\binom{4}{2}\binom{4}{1}^{3} = 1{,}536\)
+                  </td>
+                  <td class="num">307,200</td>
+                </tr>
+                <tr>
+                  <td>four of a kind</td>
+                  <td>\(\{4^{1}, 1^{4}\}\)</td>
+                  <td class="num">5</td>
+                  <td class="num">10</td>
+                  <td class="num">\(\binom{5}{1,4} = 5\)</td>
+                  <td class="num">\(\binom{4}{4}\binom{4}{1}^{4} = 256\)</td>
+                  <td class="num">12,800</td>
+                </tr>
+                <tr class="hl fragment">
+                  <td colspan="6">total: 9.82%</td>
+                  <td class="num">73,870,336</td>
+                </tr>
+              </tbody>
+            </table>
+
+          </section>
+
+          <section>
+            <h2>Run It</h2>
+            <pre><code class="language-scala" data-trim><script type="text/template">
+  (5 to 13).map(n => n -> computeStraightCount(n))
+          
+  </script></code></pre>
+            <table>
+              <thead>
+                <tr>
+                  <th>Hand size</th>
+                  <th class="num">Total hands</th>
+                  <th class="num">With a straight</th>
+                  <th class="num">Probability</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>5</td>
+                  <td class="num">2,598,960</td>
+                  <td class="num">10,240</td>
+                  <td class="num">0.39%</td>
+                </tr>
+                <tr>
+                  <td>6</td>
+                  <td class="num">20,358,520</td>
+                  <td class="num">367,616</td>
+                  <td class="num">1.81%</td>
+                </tr>
+                <tr>
+                  <td>7</td>
+                  <td class="num">133,784,560</td>
+                  <td class="num">6,454,272</td>
+                  <td class="num">4.82%</td>
+                </tr>
+                <tr class="hl">
+                  <td>8</td>
+                  <td class="num">752,538,150</td>
+                  <td class="num">73,870,336</td>
+                  <td class="num">9.82%</td>
+                </tr>
+                <tr>
+                  <td>9</td>
+                  <td class="num">3,679,075,400</td>
+                  <td class="num">619,588,736</td>
+                  <td class="num">16.84%</td>
+                </tr>
+                <tr class="fragment">
+                  <td>10</td>
+                  <td class="num">15,820,024,220</td>
+                  <td class="num">4,051,217,344</td>
+                  <td class="num">25.61%</td>
+                </tr>
+                <tr class="fragment">
+                  <td>11</td>
+                  <td class="num">60,403,728,840</td>
+                  <td class="num">21,461,806,976</td>
+                  <td class="num">35.53%</td>
+                </tr>
+                <tr class="fragment">
+                  <td>12</td>
+                  <td class="num">206,379,406,870</td>
+                  <td class="num">94,674,009,184</td>
+                  <td class="num">45.87%</td>
+                </tr>
+                <tr class="fragment">
+                  <td>13</td>
+                  <td class="num">635,013,559,600</td>
+                  <td class="num">355,161,047,872</td>
+                  <td class="num">55.93%</td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+        </section>
+
+        <!-- ============================================ -->
+        <!-- NOW WITH GAPS                                -->
+        <!-- ============================================ -->
+
+        <section>
+          <section class="small-code">
+            <h2>Now With Gaps</h2>
+            <p style="font-size: 0.7em; margin: 0">
+              $$\sum_{d} \textcolor{#f4c430}{S_g(r)}\, P(d)\, Su(d)$$
+            </p>
+            <p style="font-size: 0.72em; margin: 0 0 0.2em 0">
+              Only \(S\) knows what a straight is, so only \(S\) changes:
+              \(S(r)\) becomes \(S_g(r)\), with \(g\) the biggest gap allowed
+            </p>
+            <p style="font-size: 0.72em; margin: 0 0 0.3em 0">
+              Normal straights correspond to \(S_0\). The Shortcut Joker
+              corresponds to \(S_1\). \(P(d)\) and \(Su(d)\) remain the same
+            </p>
+            <pre><code class="language-scala" data-trim data-line-numbers="1|4"><script type="text/template">
+def computeStraightCount(handSize: Int, maxGap: Int): Long =
+  getDegeneracyClasses(handSize)
+    .map { d =>
+      countStraightRankSets(d, maxGap) * placementFactor(d) * suitFactor(d)
+    }
+    .sum
+</script></code></pre>
+            <p class="fragment subtitle" style="margin-top: 0.1em">
+              The recursion for \(S\) still works, so only its base case changes
+            </p>
+
+          </section>
+          <section class="small-code">
+            <h2>Threading the Gap Through</h2>
+            <pre><code class="language-scala" data-trim data-line-numbers="1-2|4-5|6-10"><script type="text/template">
+def countStraightRankSets(d: DegeneracyClass, maxGap: Int): Long =
+  rankSetsWithStraight(d.values.sum, maxGap).size
+
+def rankSetsWithStraight(r: Int, maxGap: Int): Set[RankSet] =
+  if r < 5 then Set.empty
+  else if r == 5 then allFiveRankStraights(maxGap)
+  else
+    for
+      rankSet   <- rankSetsWithStraight(r - 1, maxGap)
+      otherRank <- Rank.values.toSet diff rankSet
+    yield rankSet + otherRank
+</script></code></pre>
+            <p class="fragment subtitle">
+              Only the base case changes:
+              <code class="language-scala">allFiveRankStraights(maxGap)</code>
+              builds a tree of straights from every starting rank
+            </p>
+          </section>
+        </section>
+
+        <section>
+          <h2>Base Case for Normal Straights</h2>
+          <div class="figure-row">
+            <div class="figure img-white-bg">
+              <img
+                src="img/doodle/trees/normal-straights.png"
+                alt="Ten chains of five ranks, one per starting rank from Ace to 10"
+                style="max-height: 460px"
+              />
+            </div>
+            <div class="caption">
+              <p>Start with the Ace low straight</p>
+              <p class="fragment">
+                And then generate the rest by increasing all ranks by one
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <section>
+            <h2>Base Case for Gappy Straights</h2>
+            <div class="full-width img-white-bg">
+              <img
+                src="img/doodle/trees/gap-2-shortcut.png"
+                alt="A binary tree from the Ace: at each step add 1 or 2 ranks; 16 leaves, each a gappy straight"
+                style="max-height: 300px"
+              />
+            </div>
+            <p style="font-size: 0.85em; margin-top: 0.5em">
+              From an Ace the next rank can be a 2 <em>or</em> a 3! Each time we
+              select the next rank there are actually 2 choices
+            </p>
+            <p class="fragment" style="font-size: 0.85em">
+              \(2^4 = 16\) Ace-low gappy straights
+            </p>
+          </section>
+          <section class="small-code">
+            <h2>Base Case for Gappy Straights, in Scala</h2>
+            <pre><code class="language-scala" data-trim data-line-numbers="2-3|6-11|14"><script type="text/template">
+def genStraightsWithAceLow(maxGap: Int): List[RankSet] =
+  def go(state: List[RankSet], size: Int): List[RankSet] =
+    if size == 5 then state
+    else
+      go(
+        for
+          hand    <- state
+          step    <- (1 to maxGap + 1).toList
+          newRank  = hand.map(_.ordinal).max + step
+          if newRank <= Rank.King.ordinal
+        yield hand + Rank.fromOrdinal(newRank),
+        size + 1,
+      )
+  go(List(Set(Rank.Ace)), 1)
+</script></code></pre>
+          </section>
+        </section>
+
+        <section>
+          <section>
+            <h2>Start With Cards Other Than Ace</h2>
+            <div class="figure-row">
+              <div class="figure img-white-bg">
+                <img
+                  src="img/doodle/trees/gap-2-from-9.png"
+                  alt="The same tree started from a 9: branches that pass a high Ace are cut off, leaving 5 straights"
+                  style="max-height: 400px"
+                />
+              </div>
+              <div class="caption">
+                <p>The same tree from every start</p>
+                <p style="font-size: 0.75em">
+                  <span style="color: #2e8b57">&#9679;</span> a gappy straight
+                  &nbsp; <span style="color: #dc143c">&#9679;</span> past the
+                  Ace, pruned
+                </p>
+                <p class="fragment">128 gappy straights, instead of 10</p>
+                <p class="fragment">
+                  Fewer than the \(16 \times 10 = 160\) the tree suggests: trees
+                  that start high get pruned at the Ace
+                </p>
+              </div>
+            </div>
+          </section>
+
+          <section class="small-code">
+            <h2>Every Starting Rank, in Scala</h2>
+            <pre><code class="language-scala" data-trim data-line-numbers="1|4|6-9|10|11-15"><script type="text/template">
+val aceHighOrdinal = Rank.King.ordinal + 1
+
+private def allFiveRankStraights(maxGap: Int): Set[RankSet] = {
+  val aceLowAsOrdinals = genStraightsWithAceLow(maxGap).map(_.map(_.ordinal))
+
+  Iterator
+    .iterate(aceLowAsOrdinals)(
+      _.map(_.map(_ + 1)).filter(rs => !rs.contains(aceHighOrdinal + 1))
+    )
+    .takeWhile(_.nonEmpty)
+    .flatten
+    .map(_.map(x =>
+      if x == aceHighOrdinal then Rank.Ace else Rank.fromOrdinal(x)
+    ))
+    .toSet
+}
+</script></code></pre>
+            <p class="subtitle">
+              Add 1 to everything each round, kicking out anything past the high
+              Ace, until nothing is left
+            </p>
+            <p class="fragment subtitle">
+              Then flatten, and map the ordinals back to ranks: 128 gappy
+              straights
+            </p>
+          </section>
+        </section>
+
+        <section>
+          <section>
+            <h2>Eight Cards, With Gaps</h2>
+            <table>
+              <thead>
+                <tr>
+                  <th>class</th>
+                  <th>multiset</th>
+                  <th class="num">\(r\)</th>
+                  <th class="num">\(S_1(r)\)</th>
+                  <th class="num">\(P(d)\)</th>
+                  <th class="num">\(Su(d)\)</th>
+                  <th class="num">product</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>no duplicates</td>
+                  <td>\(\{1^{8}\}\)</td>
+                  <td class="num">8</td>
+                  <td class="num"><span class="hl-word">1,156</span></td>
+                  <td class="num">\(\binom{8}{8} = 1\)</td>
+                  <td class="num">\(\binom{4}{1}^{8} = 65{,}536\)</td>
+                  <td class="num">75,759,616</td>
+                </tr>
+                <tr>
+                  <td>one pair</td>
+                  <td>\(\{2^{1}, 1^{6}\}\)</td>
+                  <td class="num">7</td>
+                  <td class="num"><span class="hl-word">1,096</span></td>
+                  <td class="num">\(\binom{7}{1,6} = 7\)</td>
+                  <td class="num">
+                    \(\binom{4}{2}\binom{4}{1}^{6} = 24{,}576\)
+                  </td>
+                  <td class="num">188,547,072</td>
+                </tr>
+                <tr>
+                  <td>two pairs</td>
+                  <td>\(\{2^{2}, 1^{4}\}\)</td>
+                  <td class="num">6</td>
+                  <td class="num"><span class="hl-word">576</span></td>
+                  <td class="num">\(\binom{6}{2,4} = 15\)</td>
+                  <td class="num">
+                    \(\binom{4}{2}^{2}\binom{4}{1}^{4} = 9{,}216\)
+                  </td>
+                  <td class="num">79,626,240</td>
+                </tr>
+                <tr>
+                  <td>three of a kind</td>
+                  <td>\(\{3^{1}, 1^{5}\}\)</td>
+                  <td class="num">6</td>
+                  <td class="num"><span class="hl-word">576</span></td>
+                  <td class="num">\(\binom{6}{1,5} = 6\)</td>
+                  <td class="num">
+                    \(\binom{4}{3}\binom{4}{1}^{5} = 4{,}096\)
+                  </td>
+                  <td class="num">14,155,776</td>
+                </tr>
+                <tr>
+                  <td>three pairs</td>
+                  <td>\(\{2^{3}, 1^{2}\}\)</td>
+                  <td class="num">5</td>
+                  <td class="num"><span class="hl-word">128</span></td>
+                  <td class="num">\(\binom{5}{3,2} = 10\)</td>
+                  <td class="num">
+                    \(\binom{4}{2}^{3}\binom{4}{1}^{2} = 3{,}456\)
+                  </td>
+                  <td class="num">4,423,680</td>
+                </tr>
+                <tr>
+                  <td>full house</td>
+                  <td>\(\{3^{1}, 2^{1}, 1^{3}\}\)</td>
+                  <td class="num">5</td>
+                  <td class="num"><span class="hl-word">128</span></td>
+                  <td class="num">\(\binom{5}{1,1,3} = 20\)</td>
+                  <td class="num">
+                    \(\binom{4}{3}\binom{4}{2}\binom{4}{1}^{3} = 1{,}536\)
+                  </td>
+                  <td class="num">3,932,160</td>
+                </tr>
+                <tr>
+                  <td>four of a kind</td>
+                  <td>\(\{4^{1}, 1^{4}\}\)</td>
+                  <td class="num">5</td>
+                  <td class="num"><span class="hl-word">128</span></td>
+                  <td class="num">\(\binom{5}{1,4} = 5\)</td>
+                  <td class="num">\(\binom{4}{4}\binom{4}{1}^{4} = 256\)</td>
+                  <td class="num">163,840</td>
+                </tr>
+                <tr class="hl fragment">
+                  <td colspan="6">total</td>
+                  <td class="num">366,608,384</td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+
+          <section>
+            <h2>Rank Sets With a Gappy Straight</h2>
+            <table>
+              <thead>
+                <tr>
+                  <th class="num">\(r\)</th>
+                  <th class="num">\(S_0(r)\)</th>
+                  <th class="num">\(S_1(r)\)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="num">5</td>
+                  <td class="num">10</td>
+                  <td class="num">128</td>
+                </tr>
+                <tr>
+                  <td class="num">6</td>
+                  <td class="num">71</td>
+                  <td class="num">576</td>
+                </tr>
+                <tr>
+                  <td class="num">7</td>
+                  <td class="num">217</td>
+                  <td class="num">1,096</td>
+                </tr>
+                <tr>
+                  <td class="num">8</td>
+                  <td class="num">371</td>
+                  <td class="num">1,156</td>
+                </tr>
+                <tr>
+                  <td class="num">9</td>
+                  <td class="num">384</td>
+                  <td class="num">709</td>
+                </tr>
+                <tr>
+                  <td class="num">10</td>
+                  <td class="num">234</td>
+                  <td class="num">286</td>
+                </tr>
+                <tr>
+                  <td class="num">11</td>
+                  <td class="num">77</td>
+                  <td class="num">78</td>
+                </tr>
+                <tr>
+                  <td class="num">12</td>
+                  <td class="num">13</td>
+                  <td class="num">13</td>
+                </tr>
+                <tr>
+                  <td class="num">13</td>
+                  <td class="num">1</td>
+                  <td class="num">1</td>
+                </tr>
+              </tbody>
+            </table>
+            <p class="fragment subtitle">
+              The recursive step is the same, it's just that with gappy
+              straights we have more to begin with!
+            </p>
+          </section>
+        </section>
+
+        <section>
+          <section>
+            <h2>The Answer</h2>
+            <p class="fragment" style="font-size: 1.4em">
+              $$\frac{366{,}608{,}384}{752{,}538{,}150} = 48.72\%$$
+            </p>
+            <p class="fragment" style="margin: 0.2em 0">
+              <img
+                src="img/silly/5050Logo.png"
+                alt="The 50/50 logo"
+                style="height: 150px; margin: 0"
+              />
+            </p>
+            <p class="fragment subtitle">
+              Without the joker it was about 10%, so having this joker makes
+              getting a straight 5 times easier!!!
+            </p>
+          </section>
+          <section class="small-table">
+            <h2>All of It</h2>
+            <table>
+              <thead>
+                <tr>
+                  <th>Hand size</th>
+                  <th class="num">Gap 0</th>
+                  <th class="num">Gap 1</th>
+                  <th class="num">Gap 2</th>
+                  <th class="num">Gap 3</th>
+                  <th class="num">Gap 4</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>5</td>
+                  <td class="num">0.39%</td>
+                  <td class="num">5.04%</td>
+                  <td class="num">18.56%</td>
+                  <td class="num">33.69%</td>
+                  <td class="num">43.26%</td>
+                </tr>
+                <tr>
+                  <td>6</td>
+                  <td class="num">1.81%</td>
+                  <td class="num">16.42%</td>
+                  <td class="num">41.95%</td>
+                  <td class="num">62.84%</td>
+                  <td class="num">74.68%</td>
+                </tr>
+                <tr>
+                  <td>7</td>
+                  <td class="num">4.82%</td>
+                  <td class="num">31.99%</td>
+                  <td class="num">62.07%</td>
+                  <td class="num">80.36%</td>
+                  <td class="num">89.56%</td>
+                </tr>
+                <tr class="hl">
+                  <td>8</td>
+                  <td class="num">9.82%</td>
+                  <td class="num"><strong>48.72%</strong></td>
+                  <td class="num">76.83%</td>
+                  <td class="num">89.87%</td>
+                  <td class="num">95.71%</td>
+                </tr>
+                <tr>
+                  <td>9</td>
+                  <td class="num">16.84%</td>
+                  <td class="num">63.94%</td>
+                  <td class="num">86.66%</td>
+                  <td class="num">94.89%</td>
+                  <td class="num">98.20%</td>
+                </tr>
+                <tr>
+                  <td>10</td>
+                  <td class="num">25.61%</td>
+                  <td class="num">76.17%</td>
+                  <td class="num">92.73%</td>
+                  <td class="num">97.50%</td>
+                  <td class="num">99.23%</td>
+                </tr>
+                <tr>
+                  <td>11</td>
+                  <td class="num">35.53%</td>
+                  <td class="num">85.07%</td>
+                  <td class="num">96.23%</td>
+                  <td class="num">98.82%</td>
+                  <td class="num">99.68%</td>
+                </tr>
+                <tr>
+                  <td>12</td>
+                  <td class="num">45.87%</td>
+                  <td class="num">91.06%</td>
+                  <td class="num">98.13%</td>
+                  <td class="num">99.46%</td>
+                  <td class="num">99.87%</td>
+                </tr>
+                <tr>
+                  <td>13</td>
+                  <td class="num">55.93%</td>
+                  <td class="num">94.86%</td>
+                  <td class="num">99.11%</td>
+                  <td class="num">99.76%</td>
+                  <td class="num">99.95%</td>
+                </tr>
+              </tbody>
+            </table>
+            <p class="fragment subtitle">
+              Gap 0 is a normal straight. Gap 1 is the Shortcut Joker. Gaps 2 to
+              4 need a joker that doesn't exist yet
+            </p>
+          </section>
+        </section>
+
+        <section>
+          <h2>One Idea, Three Ways</h2>
+          <div
+            class="highlight-box"
+            style="margin: 0 auto 0.5em auto; width: fit-content"
+          >
+            Whether a hand contains a straight depends only on its rank set
+          </div>
+          <div class="two-col" style="align-items: center; gap: 40px">
+            <div class="img-white-bg" style="flex: 0 1 auto; line-height: 0">
+              <img
+                src="img/doodle/general/only-ranks-matter.png"
+                alt="A hand, the same hand with suits removed, and its rank set"
+                style="max-height: 360px; margin: 0"
+              />
+            </div>
+            <div style="flex: 1 1 auto">
+              <p class="fragment" style="font-size: 0.95em">
+                $$\sum_{d} \textcolor{#f4c430}{S_g(r)}\, P(d)\, Su(d)$$
+              </p>
+              <pre
+                class="fragment"
+                style="font-size: 0.42em"
+              ><code class="language-scala" data-trim><script type="text/template">
+getDegeneracyClasses(handSize)
+  .map { d =>
+    countStraightRankSets(d, maxGap) * placementFactor(d) * suitFactor(d)
+  }
+  .sum
+</script></code></pre>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============================================ -->
+        <!-- THANKS                                       -->
+        <!-- ============================================ -->
+
+        <section>
+          <h2>An Exercise for the Reader</h2>
+          <div class="two-col" style="gap: 56px; justify-content: center">
+            <div style="flex: 0 0 auto">
+              <img
+                src="img/jokers/four-fingers.png"
+                alt="The Four Fingers joker"
+              />
+              <p class="joker-name">Four Fingers</p>
+            </div>
+            <div style="flex: 0 1 640px">
+              <div class="highlight-box">
+                All Flushes and Straights can be made with 4 cards
+              </div>
+              <p class="fragment" style="font-size: 0.85em; margin-top: 0.8em">
+                Which parts of \(\sum_{d} S(r)\, P(d)\, Su(d)\) change?
+              </p>
+              <p class="fragment" style="font-size: 0.85em">
+                What are the odds of a straight in 8 cards? And with the
+                Shortcut Joker as well?
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2>Thanks</h2>
+          <ul
+            style="
+              list-style: none;
+              font-size: 0.8em;
+              text-align: left;
+              display: inline-block;
+            "
+          >
+            <li>
+              <a href="https://noelwelsh.com/" target="_blank" rel="noopener"
+                >Noel Welsh</a
+              >, for mentoring me
+            </li>
+            <li>
+              <a
+                href="https://www.creativescala.org/doodle/"
+                target="_blank"
+                rel="noopener"
+                >Doodle</a
+              >, for the cards, trees and charts
+            </li>
+            <li>
+              The
+              <a
+                href="https://math.stackexchange.com/questions/3084135/calculating-combinations-of-a-straight-in-texas-hold-em"
+                target="_blank"
+                rel="noopener"
+                >Math Stack Exchange answer</a
+              >
+              on straights in Texas Hold'em, for the degeneracy classes
+            </li>
+            <li>
+              LocalThunk and Playstack, for
+              <a
+                href="https://www.playbalatro.com/"
+                target="_blank"
+                rel="noopener"
+                >Balatro</a
+              >: the screenshot and the joker art
+            </li>
+          </ul>
+          <p class="subtitle" style="margin-top: 1em">
+            The blog post:
+            <a
+              href="https://stanosphere.github.io/blog/counting-balatro-straights/"
+              target="_blank"
+              rel="noopener"
+              >stanosphere.github.io/blog/counting-balatro-straights</a
+            >
+          </p>
+        </section>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/highlight.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/math/math.js"></script>
+    <script>
+      Reveal.initialize({
+        width: 1280,
+        height: 720,
+        hash: true,
+        slideNumber: true,
+        plugins: [RevealHighlight, RevealMath.KaTeX],
+        highlight: {
+          highlightOnLoad: true,
+        },
+      }).then(() => {
+        document
+          .querySelectorAll(".reveal :not(pre) > code.language-scala")
+          .forEach((el) =>
+            Reveal.getPlugin("highlight").hljs.highlightElement(el),
+          );
+      });
+    </script>
+  </body>
+</html>

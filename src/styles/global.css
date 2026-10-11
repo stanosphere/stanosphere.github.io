@@ -79,6 +79,10 @@ h6 {
 .site-head a {
   text-decoration: none;
 }
+.site-head nav {
+  display: flex;
+  gap: 1rem;
+}
 .site-title {
   font-family: var(--sans);
   font-weight: 700;
@@ -98,7 +102,8 @@ h6 {
   color: var(--muted);
   font-size: 0.95rem;
 }
-.post-list time {
+.post-list time,
+.post-list .date-tbc {
   color: var(--muted);
   font-size: 0.8rem;
   font-family: var(--sans);
