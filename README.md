@@ -51,3 +51,8 @@ deploys to GitHub Pages.
 > **One-time setup:** in the repo on GitHub, go to
 > **Settings → Pages → Build and deployment → Source** and set it to
 > **GitHub Actions**. Without this the workflow can't publish.
+
+## TODO
+
+- add favicon
+- add share preview
