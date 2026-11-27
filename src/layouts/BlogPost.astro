@@ -26,6 +26,7 @@ const toc = headings.filter(
       )}
       {draft && <span class="draft-tag">draft</span>}
     </p>
+    <slot name="meta" />
     {toc.length > 0 && (
       <nav class="toc" aria-label="Table of contents">
         <p class="toc-title">Contents</p>

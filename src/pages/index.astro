@@ -2,6 +2,7 @@
 import Base from "../layouts/Base.astro";
 import PostList from "../components/PostList.astro";
 import TalkList from "../components/TalkList.astro";
+import AocList from "../components/AocList.astro";
 ---
 
 <Base title="stanosphere" description="Paul Stanford's blog">
@@ -10,4 +11,10 @@ import TalkList from "../components/TalkList.astro";
   <PostList />
   <h2>Talks</h2>
   <TalkList />
+  <h2>Advent of Code</h2>
+  <p>
+    Write ups of my Haskell solutions to{" "}
+    <a href="https://adventofcode.com/">Advent of Code</a>.
+  </p>
+  <AocList headingLevel={3} />
 </Base>
