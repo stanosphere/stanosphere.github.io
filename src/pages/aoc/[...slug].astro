@@ -18,6 +18,9 @@ const { post } = Astro.props;
 const { Content, headings } = await render(post);
 const { year, day } = post.data;
 const puzzleUrl = `https://adventofcode.com/${year}/day/${day}`;
+const codePath = post.data.code ?? `src/${year}/Day${day}.hs`;
+const codeUrl = `https://github.com/stanosphere/advent-of-code/blob/main/${codePath}`;
+const codeFile = codePath.split("/").pop();
 ---
 
 <BlogPost
@@ -29,6 +32,8 @@ const puzzleUrl = `https://adventofcode.com/${year}/day/${day}`;
 >
   <p slot="meta" style="color: var(--muted);">
     Puzzle: <a href={puzzleUrl}>{year} day {day}</a>
+    {" · "}
+    Code: <a href={codeUrl}>{codeFile}</a>
   </p>
   <Content />
 </BlogPost>

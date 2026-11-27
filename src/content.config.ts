@@ -33,6 +33,9 @@ const aoc = defineCollection({
     description: z.string().optional(),
     year: z.number().int(),
     day: z.number().int().min(1).max(25),
+    // Path of the solution in the advent-of-code repo, if it isn't
+    // src/<year>/Day<day>.hs.
+    code: z.string().optional(),
     draft: z.boolean().default(true),
     pubDate: z.coerce.date().optional(),
   }),

@@ -56,14 +56,17 @@ mkdir -p src/content/aoc/2026
 cp AoC-template.md src/content/aoc/2026/day-01.md
 ```
 
-Frontmatter:
+Each post links to its puzzle and to its solution in the
+[advent-of-code](https://github.com/stanosphere/advent-of-code) repo, both
+worked out from `year` and `day`. Frontmatter:
 
 ```yaml
 ---
 title: "Advent of Code 2020 Day 9"
-description: "Optional one-liner for the /aoc/ page; meta description falls back to the title."
+description: "Optional meta description; falls back to the title."
 year: 2020
 day: 9
+code: src/2020/Day9.hs # optional; this is the default
 draft: true
 pubDate: 2026-12-01
 ---
