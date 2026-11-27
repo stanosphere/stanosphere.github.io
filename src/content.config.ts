@@ -26,4 +26,16 @@ const talks = defineCollection({
   }),
 });
 
-export const collections = { blog, talks };
+const aoc = defineCollection({
+  loader: glob({ pattern: "**/*.md", base: "./src/content/aoc" }),
+  schema: z.object({
+    title: z.string(),
+    description: z.string().optional(),
+    year: z.number().int(),
+    day: z.number().int().min(1).max(25),
+    draft: z.boolean().default(true),
+    pubDate: z.coerce.date().optional(),
+  }),
+});
+
+export const collections = { blog, talks, aoc };

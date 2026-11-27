@@ -1,0 +1,34 @@
+---
+import { getCollection, render } from "astro:content";
+import BlogPost from "../../layouts/BlogPost.astro";
+
+export async function getStaticPaths() {
+  // In production, drafts get no page at all. Run `astro dev` locally to see them.
+  const showDrafts = import.meta.env.DEV;
+  const posts = (await getCollection("aoc")).filter(
+    (p) => showDrafts || !p.data.draft,
+  );
+  return posts.map((post) => ({
+    params: { slug: post.id },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content, headings } = await render(post);
+const { year, day } = post.data;
+const puzzleUrl = `https://adventofcode.com/${year}/day/${day}`;
+---
+
+<BlogPost
+  title={post.data.title}
+  description={post.data.description ?? post.data.title}
+  pubDate={post.data.pubDate}
+  draft={post.data.draft}
+  headings={headings}
+>
+  <p slot="meta" style="color: var(--muted);">
+    Puzzle: <a href={puzzleUrl}>{year} day {day}</a>
+  </p>
+  <Content />
+</BlogPost>

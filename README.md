@@ -43,6 +43,32 @@ Features wired up:
 
 To publish a draft: set `draft: false` and give it a `pubDate`.
 
+## Writing an Advent of Code post
+
+These live apart from the main posts, in `src/content/aoc/<year>/day-NN.md`,
+and are served at `/aoc/<year>/day-NN/`.
+
+Start each one from [`AoC-template.md`](AoC-template.md), which has the
+frontmatter and section headings:
+
+```bash
+mkdir -p src/content/aoc/2026
+cp AoC-template.md src/content/aoc/2026/day-01.md
+```
+
+Frontmatter:
+
+```yaml
+---
+title: "Advent of Code 2020 Day 9"
+description: "Optional one-liner for the /aoc/ page; meta description falls back to the title."
+year: 2020
+day: 9
+draft: true
+pubDate: 2026-12-01
+---
+```
+
 ## Deploy
 
 Pushing to `main` triggers `.github/workflows/deploy.yml`, which builds and

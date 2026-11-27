@@ -1,0 +1,52 @@
+---
+import { getCollection } from "astro:content";
+
+interface Props {
+  // Level of the year headings: 3 under the home page's "Advent of Code" h2,
+  // 2 on the /aoc/ page under its h1.
+  headingLevel?: 2 | 3;
+}
+const { headingLevel = 2 } = Astro.props;
+const YearHeading = `h${headingLevel}`;
+
+// In production, hide drafts. Run `astro dev` locally to see them.
+const showDrafts = import.meta.env.DEV;
+const posts = (await getCollection("aoc")).filter(
+  (p) => showDrafts || !p.data.draft,
+);
+
+// Newest year first, then the days of each year in order.
+const years = [...new Set(posts.map((p) => p.data.year))].sort((a, b) => b - a);
+const daysOf = (year: number) =>
+  posts
+    .filter((p) => p.data.year === year)
+    .sort((a, b) => a.data.day - b.data.day);
+---
+
+{
+  years.map((year) => (
+    <>
+      <YearHeading>{year}</YearHeading>
+      <ul class="aoc-days">
+        {daysOf(year).map((post) => (
+          <li>
+            <a href={`/aoc/${post.id}/`}>Day {post.data.day}</a>
+            {post.data.draft && <span class="draft-tag">draft</span>}
+          </li>
+        ))}
+      </ul>
+    </>
+  ))
+}
+{posts.length === 0 && <p>Nothing published yet.</p>}
+
+<style>
+  /* Up to 25 days a year, so a wrapped row rather than one line each. */
+  .aoc-days {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.5rem;
+  }
+</style>
